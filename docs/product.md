@@ -114,9 +114,13 @@ costs X credits. Finding content can come from several sources, each added on it
 - D13. Pinned post gets no special treatment; the preview flags it if selected. The user can add
   it to the keep list.
 - D14. xclean reads the archive zip as X sends it; no unzipping needed.
+- D15. The running terminal shows a live progress line. `xclean status` reads saved progress at
+  any time, from another terminal, after a stop, or for a cloud run.
+- D16. The hard spending cap is X's own spending limit in the Developer Console; docs tell the
+  user to set one. xclean shows estimated spend so far during a run. If X blocks a request for
+  spending limit, the run stops cleanly, says why, and resumes after top-up.
 - D17. Dates in rules use the user's local time zone.
 
 ## Open questions
 
-- D15. How the user watches progress (in grilling).
-- D16. Spending cap (in grilling).
+- Stack: decide in the first plan, with the later cloud runner in mind.

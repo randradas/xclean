@@ -62,6 +62,15 @@ Activity the user did:
 - DMs
 - Poll votes (probably not undoable)
 
+## Sources
+
+Finding content and removing it are separate. Removal is always by ID through the X API, and
+costs X credits. Finding content can come from several sources, each added on its own:
+
+1. X archive file: free, covers all posts and likes, takes 24 to 48 hours to arrive. First.
+2. Later: timeline API (newest 3,200 posts, cheap), full-archive search (all posts, paid), and
+   other list endpoints per content type.
+
 ## Non-goals
 
 - Acting on any account other than the user's own.
@@ -75,7 +84,6 @@ Activity the user did:
 
 ## Open questions
 
-- Data source: research suggests archive to find, API to remove. Confirm.
 - Order: which content types come first?
 - Cost: the user pays X per request. Show estimated cost in the preview?
 - Backup: export content before removing it?

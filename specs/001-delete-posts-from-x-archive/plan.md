@@ -1,5 +1,5 @@
 ---
-status: draft
+status: approved
 ---
 
 # Plan: Delete posts from X archive

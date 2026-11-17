@@ -18,17 +18,44 @@ An X user cleaning up their own account. Example jobs:
 
 ## Goals
 
-- Cover any content or activity the user created on X:
-  - posts, including those with images or video
-  - replies (comments)
-  - quote posts
-  - reposts (undo)
-  - likes (undo)
+- Cover every kind of content or activity the user created on X (see Content types).
+- Grow with X: when X adds a new kind of content, or its API opens a new one to removal,
+  supporting it is a small, self-contained change.
 - Select what to remove by rules: content type, date range, or everything. More rules can come
   later.
 - Preview: show what matches before removing anything.
 - Remove safely: track progress, respect X rate limits, and resume after an interruption with
   no double work.
+
+## Content types
+
+Known today. Which ones X lets a tool remove is not yet checked; some may be removable only in
+the app, or not at all.
+
+Content the user made:
+
+- Posts, including polls, threads, and posts with images or video
+- Replies (comments)
+- Quote posts
+- Articles
+- Community posts and replies
+- Community Notes and note ratings
+- Spaces hosted, and their recordings
+- Drafts and scheduled posts
+- Grok chats
+- Profile fields: bio, avatar, header, location, website, pinned post
+
+Activity the user did:
+
+- Reposts (undo)
+- Likes (undo)
+- Bookmarks
+- Follows, and followers (remove)
+- Lists: owned, member of, followed
+- Community memberships
+- Mutes and blocks
+- DMs
+- Poll votes (probably not undoable)
 
 ## Non-goals
 
@@ -44,5 +71,6 @@ An X user cleaning up their own account. Example jobs:
 ## Open questions
 
 - Data source: X API, the user's downloaded X archive, or both?
-- Wider scope: do bookmarks, follows, lists, or DMs count as content to clean?
+- Removability: which content types can a tool remove through the X API today?
+- Order: which content types come first?
 - Backup: export content before removing it?

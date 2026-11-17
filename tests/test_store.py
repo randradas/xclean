@@ -157,3 +157,21 @@ def test_report_is_readable_from_a_new_store(tmp_path: Path) -> None:
 
 def test_sqlite_store_satisfies_the_store_protocol(store: SqliteStore) -> None:
     _: Store = store  # checked by mypy
+
+
+def test_requeue_failed_reopens_a_finished_run(store: SqliteStore) -> None:
+    run = store.start_run(ACCOUNT, [post("1")], rules="all posts")
+    store.mark(run.id, "1", ItemStatus.FAILED, reason="boom")
+    store.finish(run.id)
+    assert store.requeue_failed(run.id) == 1
+    reopened = store.current_run(ACCOUNT)
+    assert reopened is not None
+    assert reopened.state is RunState.READY
+
+
+def test_requeue_with_no_failures_keeps_run_finished(store: SqliteStore) -> None:
+    run = store.start_run(ACCOUNT, [post("1")], rules="all posts")
+    store.mark(run.id, "1", ItemStatus.DONE)
+    store.finish(run.id)
+    assert store.requeue_failed(run.id) == 0
+    assert store.current_run(ACCOUNT) is None

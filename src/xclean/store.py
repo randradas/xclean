@@ -213,10 +213,17 @@ class SqliteStore:
         )
 
     def requeue_failed(self, run_id: int) -> int:
-        cur = self._db.execute(
-            "UPDATE items SET status = ?, reason = '' WHERE run_id = ? AND status = ?",
-            (ItemStatus.PENDING, run_id, ItemStatus.FAILED),
-        )
+        """Put failed items back to pending. Reopens the run if it had finished."""
+        with self._transaction():
+            cur = self._db.execute(
+                "UPDATE items SET status = ?, reason = '' WHERE run_id = ? AND status = ?",
+                (ItemStatus.PENDING, run_id, ItemStatus.FAILED),
+            )
+            if cur.rowcount:
+                self._db.execute(
+                    "UPDATE runs SET state = ?, finished_at = NULL WHERE id = ?",
+                    (RunState.READY, run_id),
+                )
         return cur.rowcount
 
     def set_state(

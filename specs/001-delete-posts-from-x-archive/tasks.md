@@ -38,10 +38,10 @@ X client and login
 
 Engine
 
-- [ ] T14: Removal loop: one at a time, record each result before the next request, already gone
+- [x] T14: Removal loop: one at a time, record each result before the next request, already gone
   counts as done, retries then failed. (AC18, AC21)
-- [ ] T15: Rate-limit wait until reset (fake clock); spending limit stops cleanly. (AC19, AC22)
-- [ ] T16: Stop and resume deletes each post exactly once; retry-failed requeues failed items.
+- [x] T15: Rate-limit wait until reset (fake clock); spending limit stops cleanly. (AC19, AC22)
+- [x] T16: Stop and resume deletes each post exactly once; retry-failed requeues failed items.
   (AC20, AC21)
 
 Archive (needs the real archive)

@@ -14,6 +14,9 @@ on numbers.
   - Likes, mutes, blocks reads: $0.001 per resource.
 - Unverified: which billing category post delete, unlike, and unrepost fall under. Check the
   Developer Console.
+- Out of credits or over the spending limit: HTTP 402 with problem type
+  `https://api.x.com/2/problems/credits-depleted` (reported by developers, not in X's docs).
+  Some report a 403 instead when the balance is negative or the app is not enrolled.
 - Same resource is not charged twice within one UTC day (soft guarantee).
 - Implication: each user brings their own X developer app and credits. Cleanup costs money,
   roughly $0.005 to $0.010 per item removed, so the preview should show an estimated cost.

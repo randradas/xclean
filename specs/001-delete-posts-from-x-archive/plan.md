@@ -77,9 +77,11 @@ Settled while grilling the plan. Newest last.
 | `src/xclean/model.py` | Item, content type, item status, run |
 | `src/xclean/paths.py` | XDG folder resolution |
 | `src/xclean/config.py` | Client ID and settings in config folder |
-| `src/xclean/auth.py` | PKCE login flow, local callback, token store (keyring, fallback file) |
+| `src/xclean/auth.py` | PKCE login flow, local callback, logout |
+| `src/xclean/tokens.py` | Token store (keyring, fallback file) and refresh |
 | `src/xclean/xclient.py` | httpx client: auth header, refresh, rate-limit headers, retries, simple results |
 | `src/xclean/sources/archive.py` | Read zip: account ID, archive date, posts with type |
+| `src/xclean/content_types/__init__.py` | `Remover` protocol every content type follows |
 | `src/xclean/content_types/posts.py` | Remove a post by ID; its rate limit and price key |
 | `src/xclean/rules.py` | Parse and validate rules, select items, describe rules in words |
 | `src/xclean/keep.py` | Parse keep file: IDs or post links |

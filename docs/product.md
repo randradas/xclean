@@ -71,6 +71,16 @@ costs X credits. Finding content can come from several sources, each added on it
 2. Later: timeline API (newest 3,200 posts, cheap), full-archive search (all posts, paid), and
    other list endpoints per content type.
 
+## Access and deployment
+
+- Bring your own app: each user creates their own X developer app, pays X API credits, and
+  authorizes xclean to act as them (OAuth 2.0 user token). Owning the app also gets the cheaper
+  owned-read rate.
+- Local first: a CLI on the user's machine. Keys and archive stay local. Progress is saved, so a
+  run can stop and resume any time.
+- Cloud later: the same core runs as a scheduled job in the cloud, still with the user's own app.
+  A shared hosted app for other users is out of scope for now.
+
 ## Non-goals
 
 - Acting on any account other than the user's own.
@@ -87,5 +97,3 @@ costs X credits. Finding content can come from several sources, each added on it
 - Order: which content types come first?
 - Cost: the user pays X per request. Show estimated cost in the preview?
 - Backup: export content before removing it?
-- Where it runs: a CLI on the user's machine, or a long-running service? This decides how the user
-  checks progress (terminal, status command, web page, notifications).

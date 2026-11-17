@@ -8,3 +8,4 @@ Keep each doc focused. Link out instead of growing a file past ~200 lines.
 - `conventions.md` - code style, testing, git workflow
 - `glossary.md` - domain language, one line per term
 - `decisions/` - ADRs, one decision per file
+- `research/x-api.md` - X API pricing, limits, what can be removed and how

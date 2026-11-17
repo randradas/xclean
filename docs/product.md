@@ -35,8 +35,7 @@ An X user cleaning up their own account. Example jobs:
 
 ## Content types
 
-Known today. Which ones X lets a tool remove is not yet checked; some may be removable only in
-the app, or not at all.
+Known today. Not all are removable through the X API; see `research/x-api.md` for which ones are.
 
 Content the user made:
 
@@ -76,9 +75,9 @@ Activity the user did:
 
 ## Open questions
 
-- Data source: X API, the user's downloaded X archive, or both?
-- Removability: which content types can a tool remove through the X API today?
+- Data source: research suggests archive to find, API to remove. Confirm.
 - Order: which content types come first?
+- Cost: the user pays X per request. Show estimated cost in the preview?
 - Backup: export content before removing it?
 - Where it runs: a CLI on the user's machine, or a long-running service? This decides how the user
   checks progress (terminal, status command, web page, notifications).

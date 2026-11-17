@@ -32,7 +32,7 @@ X client and login
   reached, temporary error, failed (respx). (AC18, AC19, AC21, AC22)
 - [x] T11: Token store (keyring, fallback file readable only by user, one-time warning) and token
   refresh on expiry. (AC1)
-- [ ] T12: PKCE login with local callback and paste-URL fallback; `login` and `logout` commands.
+- [x] T12: PKCE login with local callback and paste-URL fallback; `login` and `logout` commands.
   (AC1)
 - [ ] T13: Posts content type: remove by ID through the X client. (AC18)
 

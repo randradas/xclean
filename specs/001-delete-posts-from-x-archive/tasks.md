@@ -17,7 +17,7 @@ Rules and keep list
 - [x] T4: Select items: no rules selects all posts, rules AND together, reposts never match.
   (AC4, AC7, AC9)
 - [x] T5: Describe applied rules in plain words. (AC28)
-- [ ] T6: Parse keep file (IDs and post links, one per line); kept posts never selected. (AC8)
+- [x] T6: Parse keep file (IDs and post links, one per line); kept posts never selected. (AC8)
 
 Store and estimates
 

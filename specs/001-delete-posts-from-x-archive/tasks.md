@@ -24,7 +24,7 @@ Store and estimates
 - [x] T7: Store interface and SQLite store: create run with frozen selection, item statuses,
   one-run lock. (AC18, AC20)
 - [x] T8: Store: save and load final report with failures and reasons. (AC25)
-- [ ] T9: Price table with checked-on date; cost and time estimates. (AC11)
+- [x] T9: Price table with checked-on date; cost and time estimates. (AC11)
 
 X client and login
 

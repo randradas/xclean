@@ -1,7 +1,7 @@
 """Core data types. Enum values are stored, so never change them."""
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import StrEnum
 
 
@@ -45,6 +45,15 @@ class Item:
             raise ValueError("created_at needs a time zone")
         if (self.content_type is ContentType.POST) != (self.kind is not None):
             raise ValueError("posts need a kind; other content types must not have one")
+
+
+@dataclass(frozen=True)
+class RateLimit:
+    """X's per-user limit for one removal endpoint."""
+
+    requests: int
+    window: timedelta
+    daily: int | None = None
 
 
 @dataclass(frozen=True)

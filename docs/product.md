@@ -100,6 +100,8 @@ costs X credits. Finding content can come from several sources, each added on it
 - D4. First version rules: date range (before or after a date), content type, or everything.
   Filters such as like count or words come later.
 - D5. Keep list: the user can name posts, by ID, that are never removed.
+- D6. Removing needs an explicit flag, then the user types the number of items to be removed.
+  `--yes` skips typing, for scripts and the cloud runner.
 - D7. Preview shows the estimated X cost, marked as an estimate.
 - D8. No separate backup step. The X archive file is the backup; docs tell the user to keep it.
 - D9. Posts made after the archive was created are not touched. The preview warns and shows the
@@ -109,7 +111,12 @@ costs X credits. Finding content can come from several sources, each added on it
 - D11. Temporary errors are retried a few times, then the item is marked failed. Failed items are
   listed in the final report with the reason, and can be retried later.
 - D12. Say "post", not "tweet" (see glossary).
+- D13. Pinned post gets no special treatment; the preview flags it if selected. The user can add
+  it to the keep list.
+- D14. xclean reads the archive zip as X sends it; no unzipping needed.
+- D17. Dates in rules use the user's local time zone.
 
 ## Open questions
 
-- D6. Confirmation before removing (in grilling).
+- D15. How the user watches progress (in grilling).
+- D16. Spending cap (in grilling).

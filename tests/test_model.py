@@ -2,7 +2,7 @@ from datetime import UTC, datetime
 
 import pytest
 
-from xclean.model import ContentType, Item, ItemStatus, PostKind
+from xclean.model import ContentType, Item, ItemStatus, PostKind, RunState
 
 
 def test_post_item_needs_a_kind() -> None:
@@ -35,3 +35,4 @@ def test_values_are_stable_strings() -> None:
     assert [k.value for k in PostKind] == ["original", "reply", "quote"]
     assert [c.value for c in ContentType] == ["post", "repost"]
     assert [s.value for s in ItemStatus] == ["pending", "done", "failed"]
+    assert [s.value for s in RunState] == ["ready", "working", "waiting", "stopped", "finished"]

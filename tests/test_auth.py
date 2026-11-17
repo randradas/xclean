@@ -1,5 +1,6 @@
 import base64
 import hashlib
+import socket
 import threading
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
@@ -126,26 +127,45 @@ def test_logout_forgets_even_if_x_unreachable() -> None:
     assert store.load() is None
 
 
+def _free_port() -> int:
+    with socket.socket() as sock:
+        sock.bind(("127.0.0.1", 0))
+        port: int = sock.getsockname()[1]
+        return port
+
+
 def test_local_callback_server_returns_the_url() -> None:
-    uri = "http://127.0.0.1:8799/callback"
+    uri = f"http://127.0.0.1:{_free_port()}/callback"
     result: list[str | None] = []
-    thread = threading.Thread(target=lambda: result.append(wait_for_callback(uri, timeout=5)))
+    thread = threading.Thread(target=lambda: result.append(wait_for_callback(uri, timeout=10)))
     thread.start()
+    response: httpx.Response | None = None
+    errors: list[str] = []
     # Until the server is bound, connecting fails. On macOS with stealth mode the attempt
     # times out instead of being refused, so retry on any transport error.
     for _ in range(50):
         try:
             response = httpx.get(f"{uri}?state=s&code=c", timeout=0.5, trust_env=False)
             break
-        except httpx.TransportError:
+        except httpx.TransportError as e:
+            errors.append(repr(e))
             threading.Event().wait(0.05)
     thread.join()
+    assert response is not None, errors[-3:]
     assert response.status_code == 200
     assert result == [f"{uri}?state=s&code=c"]
 
 
 def test_local_callback_server_times_out() -> None:
-    assert wait_for_callback("http://127.0.0.1:8798/callback", timeout=0.2) is None
+    assert wait_for_callback(f"http://127.0.0.1:{_free_port()}/callback", timeout=0.2) is None
+
+
+def test_busy_port_gives_none_so_user_can_paste() -> None:
+    with socket.socket() as sock:
+        sock.bind(("127.0.0.1", 0))
+        sock.listen()
+        port = sock.getsockname()[1]
+        assert wait_for_callback(f"http://127.0.0.1:{port}/callback", timeout=0.2) is None
 
 
 def test_config_round_trip(tmp_path: Path) -> None:

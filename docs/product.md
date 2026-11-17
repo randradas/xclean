@@ -26,6 +26,12 @@ An X user cleaning up their own account. Example jobs:
 - Preview: show what matches before removing anything.
 - Remove safely: track progress, respect X rate limits, and resume after an interruption with
   no double work.
+- Show how a run is going. A cleanup can take hours or days because of rate limits, so the user
+  can check at any time:
+  - done, left, and failed counts, per content type
+  - current state: working, or waiting on a rate limit and until when
+  - estimated time to finish
+  - a final report, listing failed items and why they failed
 
 ## Content types
 
@@ -74,3 +80,5 @@ Activity the user did:
 - Removability: which content types can a tool remove through the X API today?
 - Order: which content types come first?
 - Backup: export content before removing it?
+- Where it runs: a CLI on the user's machine, or a long-running service? This decides how the user
+  checks progress (terminal, status command, web page, notifications).

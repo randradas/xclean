@@ -1,7 +1,7 @@
 ---
 id: 001-delete-posts-from-x-archive
 title: Delete posts from X archive
-status: draft
+status: approved
 created: 2026-11-17
 ---
 

@@ -48,6 +48,10 @@ Selecting posts
 - [ ] AC8: Given a keep list of post IDs or post links, one per line, then those posts are never
   selected, whatever the rules say. (D6, P5)
 - [ ] AC9: Given reposts in the archive, then they are never selected. (D7, P2)
+- [ ] AC27: Rules and the keep list are set as options on the command line. An invalid rule (bad
+  date, unknown type) stops with a clear error and nothing runs. (D11)
+- [ ] AC28: The preview states the rules it applied in plain words, e.g. "replies and quotes
+  before 1 Jan 2020, keeping 3 posts". (D11)
 
 Preview
 
@@ -95,6 +99,7 @@ Docs
 - Finding posts through the X API (timeline, search).
 - Posts newer than the archive.
 - Rules beyond date and type (like count, words).
+- A saved rules file (later, with the cloud runner, same rule names).
 - Several accounts.
 - Cloud runner.
 
@@ -114,6 +119,8 @@ Settled while grilling. Newest last.
 - D9: A run's selection is fixed at confirm. New rules mean a new run. Already deleted posts are
   always skipped and counted as done.
 - D10: Final report is shown at the end and saved; the status command shows it later.
+- D11: Rules are set with command-line options in this spec; the preview echoes them in plain
+  words. A rules file comes later.
 
 ## Open questions
 

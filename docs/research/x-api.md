@@ -26,8 +26,12 @@ on numbers.
 - So the API alone cannot find old posts on a big account. The user's X data archive can:
   `tweets.js` lists all posts, `like.js` all likes. Delete-by-ID through the API works for any
   ID, wherever it came from.
-- Conclusion: archive to discover, API to remove. API-only mode still works for small or recent
-  accounts.
+- Full-archive search (`GET /2/tweets/search/all`, `from:<user>`) is available on pay-per-use
+  and covers posts back to 2006, up to 500 per request
+  ([search intro](https://docs.x.com/x-api/posts/search/introduction.md)). It is billed as post
+  reads (likely $0.005 each, not the owned-read rate; unverified). It does not find likes.
+- Conclusion: three ways to find posts (timeline, full-archive search, archive file), one way to
+  remove (delete by ID).
 
 ## Removable content types
 

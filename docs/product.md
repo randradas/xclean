@@ -1,6 +1,6 @@
 # Product: xclean
 
-Tool to clean a given X post
+Tool to clean up a user's X posts
 
 ## Problem
 

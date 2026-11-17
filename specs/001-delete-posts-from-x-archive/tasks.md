@@ -12,11 +12,11 @@ Foundation
 
 Rules and keep list
 
-- [ ] T3: Parse and validate rules: type, before, after; clear errors for bad values. (AC5, AC6,
+- [x] T3: Parse and validate rules: type, before, after; clear errors for bad values. (AC5, AC6,
   AC27)
-- [ ] T4: Select items: no rules selects all posts, rules AND together, reposts never match.
+- [x] T4: Select items: no rules selects all posts, rules AND together, reposts never match.
   (AC4, AC7, AC9)
-- [ ] T5: Describe applied rules in plain words. (AC28)
+- [x] T5: Describe applied rules in plain words. (AC28)
 - [ ] T6: Parse keep file (IDs and post links, one per line); kept posts never selected. (AC8)
 
 Store and estimates

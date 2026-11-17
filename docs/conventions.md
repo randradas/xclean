@@ -2,12 +2,17 @@
 
 ## Code
 
-- TODO: formatter, linter, naming.
+- ruff formats and lints (`pyproject.toml`), line length 100. mypy strict.
+- Package layout: `src/xclean/`. Sources in `sources/`, content types in `content_types/`.
+- Only the X client talks HTTP. Only the CLI prints.
+- Paths follow XDG on macOS and Linux (`xclean.paths`). Never put tokens in the config folder.
 
 ## Tests
 
 - Every task in `tasks.md` ships with tests that prove its acceptance criteria.
-- TODO: test command.
+- Tests never call real X; fake it with respx.
+- Never commit a real X archive. Fixtures are small, redacted zips under `tests/fixtures/`.
+- Run all checks: `uv run ruff format && uv run ruff check && uv run mypy && uv run pytest`.
 
 ## Git
 

@@ -1,6 +1,7 @@
 # Architecture
 
-Stack: TODO: list languages, frameworks, infra
+Stack: Python 3.13 with uv. Typer and Rich (CLI), httpx (X API), SQLite (progress store),
+keyring (tokens). Later cloud runner: AWS Lambda on a schedule.
 
 ## Components
 

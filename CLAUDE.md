@@ -2,7 +2,8 @@
 
 Bulk-remove your own X content and activity, chosen by rules you set, with a preview first.
 
-Stack: TODO: list languages, frameworks, infra
+Stack: Python 3.13, uv, Typer, Rich, httpx, SQLite. macOS and Linux.
+Check: `uv run ruff format && uv run ruff check && uv run mypy && uv run pytest`
 
 ## How we work
 

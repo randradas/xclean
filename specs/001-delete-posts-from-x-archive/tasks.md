@@ -5,7 +5,7 @@ Tests first in every task. T17 needs the author's real X archive; tasks before i
 
 Foundation
 
-- [ ] T1: Scaffold package: `pyproject.toml` with uv, `xclean` script, ruff, mypy strict, pytest,
+- [x] T1: Scaffold package: `pyproject.toml` with uv, `xclean` script, ruff, mypy strict, pytest,
   respx; CI on Ubuntu and macOS; fill stack and test command in `CLAUDE.md`,
   `docs/architecture.md`, `docs/conventions.md`. (setup for all AC)
 - [ ] T2: Model (item, content type, status, run) and XDG paths honoring `XDG_*`. (AC1, AC24)

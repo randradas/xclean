@@ -131,11 +131,13 @@ def test_local_callback_server_returns_the_url() -> None:
     result: list[str | None] = []
     thread = threading.Thread(target=lambda: result.append(wait_for_callback(uri, timeout=5)))
     thread.start()
+    # Until the server is bound, connecting fails. On macOS with stealth mode the attempt
+    # times out instead of being refused, so retry on any transport error.
     for _ in range(50):
         try:
-            response = httpx.get(f"{uri}?state=s&code=c")
+            response = httpx.get(f"{uri}?state=s&code=c", timeout=0.5, trust_env=False)
             break
-        except httpx.ConnectError:
+        except httpx.TransportError:
             threading.Event().wait(0.05)
     thread.join()
     assert response.status_code == 200

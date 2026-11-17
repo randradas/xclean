@@ -28,6 +28,10 @@ Settled while grilling the plan. Newest last.
   the cloud runner can swap it.
 - D17: Cost estimate uses a built-in price table with a "checked on" date; the preview shows it.
 - D18: macOS and Linux supported, tested in CI on both. Windows not promised.
+- D19: XDG folders on macOS and Linux, honoring `XDG_*` variables. Config `~/.config/xclean/`
+  (client ID, settings). Data `~/.local/share/xclean/` (progress store, reports, fallback token
+  file). State `~/.local/state/xclean/` (logs). Never put tokens in config: it is often kept in
+  a dotfiles repo.
 
 ## Changes
 

@@ -1,6 +1,8 @@
 import base64
 import hashlib
+import os
 import socket
+import sys
 import threading
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
@@ -134,6 +136,11 @@ def _free_port() -> int:
         return port
 
 
+@pytest.mark.skipif(
+    sys.platform == "darwin" and os.environ.get("GITHUB_ACTIONS") == "true",
+    reason="GitHub macOS runners drop local connections to the test server (connect timeout); "
+    "covered locally on macOS and by the release checklist",
+)
 def test_local_callback_server_returns_the_url() -> None:
     uri = f"http://127.0.0.1:{_free_port()}/callback"
     result: list[str | None] = []

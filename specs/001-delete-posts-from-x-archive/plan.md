@@ -19,9 +19,15 @@ Settled while grilling the plan. Newest last.
 - D14: X app type "Native App": OAuth 2.0 with PKCE, no client secret, callback to a local
   address, `offline.access` for refresh tokens. Local callback support to be checked with a real
   app.
+- D13: Plain HTTP with httpx. All X calls live in one small X client part (auth and refresh,
+  rate-limit headers, retries). The rest of the code sees only simple results: deleted, already
+  gone, rate limited, spending limit reached, failed.
+- D15: Tokens go in the OS keyring (macOS Keychain, Linux Secret Service). With no keyring, they
+  go in a file readable only by the user, with a one-time warning.
 - D16: Progress store is a local SQLite file in the user data folder, behind a small interface so
   the cloud runner can swap it.
 - D17: Cost estimate uses a built-in price table with a "checked on" date; the preview shows it.
+- D18: macOS and Linux supported, tested in CI on both. Windows not promised.
 
 ## Changes
 

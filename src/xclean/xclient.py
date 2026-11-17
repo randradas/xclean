@@ -13,7 +13,17 @@ _CREDITS = "https://api.x.com/2/problems/credits-depleted"
 _DEFAULT_WAIT = timedelta(minutes=15)
 
 
+class NotLoggedIn(Exception):
+    """No usable tokens: the user must run `xclean login`."""
+
+
+class TemporaryError(Exception):
+    """X or the network failed in a way worth retrying later."""
+
+
 class Tokens(Protocol):
+    """Both raise NotLoggedIn when there is no usable token."""
+
     def access_token(self) -> str: ...
     def refresh(self) -> str: ...
 
@@ -88,8 +98,10 @@ class XClient:
     def delete_post(self, post_id: str) -> Result:
         try:
             response = self._send("DELETE", f"/2/tweets/{post_id}")
-        except httpx.TransportError as e:
+        except (httpx.TransportError, TemporaryError) as e:
             return Result(Outcome.TEMPORARY, f"network: {e}")
+        except NotLoggedIn as e:
+            return Result(Outcome.NOT_LOGGED_IN, str(e))
         return self._removal_result(response, "data", "deleted")
 
     def _removal_result(self, response: httpx.Response, *done_path: str) -> Result:
@@ -117,8 +129,10 @@ class XClient:
     def me(self) -> Me:
         try:
             response = self._send("GET", "/2/users/me", params={"user.fields": "pinned_tweet_id"})
-        except httpx.TransportError as e:
+        except (httpx.TransportError, TemporaryError) as e:
             raise XError(f"could not reach X: {e}") from None
+        except NotLoggedIn as e:
+            raise XError(str(e)) from None
         if response.status_code == 401:
             raise XError("not logged in; run `xclean login`")
         if response.status_code != 200:

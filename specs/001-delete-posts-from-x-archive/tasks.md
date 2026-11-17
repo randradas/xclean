@@ -30,7 +30,7 @@ X client and login
 
 - [x] T10: X client results: deleted, already gone, rate limited with reset time, spending limit
   reached, temporary error, failed (respx). (AC18, AC19, AC21, AC22)
-- [ ] T11: Token store (keyring, fallback file readable only by user, one-time warning) and token
+- [x] T11: Token store (keyring, fallback file readable only by user, one-time warning) and token
   refresh on expiry. (AC1)
 - [ ] T12: PKCE login with local callback and paste-URL fallback; `login` and `logout` commands.
   (AC1)

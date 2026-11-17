@@ -8,7 +8,7 @@ Foundation
 - [x] T1: Scaffold package: `pyproject.toml` with uv, `xclean` script, ruff, mypy strict, pytest,
   respx; CI on Ubuntu and macOS; fill stack and test command in `CLAUDE.md`,
   `docs/architecture.md`, `docs/conventions.md`. (setup for all AC)
-- [ ] T2: Model (item, content type, status, run) and XDG paths honoring `XDG_*`. (AC1, AC24)
+- [x] T2: Model (item, content type, status, run) and XDG paths honoring `XDG_*`. (AC1, AC24)
 
 Rules and keep list
 

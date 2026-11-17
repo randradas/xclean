@@ -105,7 +105,9 @@ Settled while grilling the plan. Newest last.
 - **Quote posts may be hard to detect in the archive.** Mitigation: same as above; if no reliable
   signal exists, raise it as a spec change rather than guess.
 - **Local callback may be rejected by X app settings.** Mitigation: check with a real app first
-  (D14). Fallback: user pastes the redirect URL back into the terminal.
+  (D14). Fallback: user pastes the redirect URL back into the terminal. On GitHub macOS
+  runners, local connections to the callback server time out, so that one test is skipped
+  there; the release checklist must confirm the browser callback works on a real Mac.
 - **Price category for post delete unknown.** Mitigation: price table assumes the higher known
   delete price until checked with one real delete (D17, D25).
 - **X changes limits, prices, or endpoints.** Mitigation: all X knowledge sits in the X client,

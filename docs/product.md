@@ -92,8 +92,24 @@ costs X credits. Finding content can come from several sources, each added on it
 - After a run, nothing matching the user's rules is left on the account.
 - Nothing outside the rules is removed.
 
+## Decisions
+
+- D1. Audience: built for the author first, open source so anyone with their own X app can use it.
+- D2. First version covers posts (original, replies, quote posts). Reposts next, then likes.
+- D3. One X account per setup. Several accounts later.
+- D4. First version rules: date range (before or after a date), content type, or everything.
+  Filters such as like count or words come later.
+- D5. Keep list: the user can name posts, by ID, that are never removed.
+- D7. Preview shows the estimated X cost, marked as an estimate.
+- D8. No separate backup step. The X archive file is the backup; docs tell the user to keep it.
+- D9. Posts made after the archive was created are not touched. The preview warns and shows the
+  archive date.
+- D10. On rate limit, the run waits in the terminal until reset. Ctrl-C is safe; a rerun resumes
+  where it stopped.
+- D11. Temporary errors are retried a few times, then the item is marked failed. Failed items are
+  listed in the final report with the reason, and can be retried later.
+- D12. Say "post", not "tweet" (see glossary).
+
 ## Open questions
 
-- Order: which content types come first?
-- Cost: the user pays X per request. Show estimated cost in the preview?
-- Backup: export content before removing it?
+- D6. Confirmation before removing (in grilling).

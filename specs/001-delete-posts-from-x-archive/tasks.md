@@ -34,7 +34,7 @@ X client and login
   refresh on expiry. (AC1)
 - [x] T12: PKCE login with local callback and paste-URL fallback; `login` and `logout` commands.
   (AC1)
-- [ ] T13: Posts content type: remove by ID through the X client. (AC18)
+- [x] T13: Posts content type: remove by ID through the X client. (AC18)
 
 Engine
 

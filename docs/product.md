@@ -1,39 +1,48 @@
 # Product: xclean
 
-Tool to clean up a user's X posts
+Bulk-remove your own X content and activity, chosen by rules you set, with a preview first.
 
 ## Problem
 
-X has no built-in way to delete posts in bulk. A user who wants to wipe their history, or drop
-everything older than some date, must delete posts one by one by hand.
+X has no built-in way to clean up an account in bulk. A user who wants to wipe their history, or
+drop everything older than some date, must delete posts and undo likes one by one by hand.
 
 ## Users
 
-An X user cleaning up their own account. Main jobs:
+An X user cleaning up their own account. Example jobs:
 
 - "Delete all my previous posts."
 - "Delete my posts before a certain date."
+- "Undo all my likes."
+- "Remove my reposts and replies, keep my original posts."
 
 ## Goals
 
-- Delete all of the user's posts.
-- Delete only posts older than a given date.
-- Show what would be deleted before deleting anything (dry run).
-- Survive interruption: a rerun picks up where it stopped, with no double work.
+- Cover any content or activity the user created on X:
+  - posts, including those with images or video
+  - replies (comments)
+  - quote posts
+  - reposts (undo)
+  - likes (undo)
+- Select what to remove by rules: content type, date range, or everything. More rules can come
+  later.
+- Preview: show what matches before removing anything.
+- Remove safely: track progress, respect X rate limits, and resume after an interruption with
+  no double work.
 
 ## Non-goals
 
 - Acting on any account other than the user's own.
-- Editing or rewriting posts.
+- Editing or rewriting content.
 - Scheduling or posting new content.
 
 ## Success measures
 
-- After a run, no post matching the user's criteria is left on the account.
-- No post outside the criteria is deleted.
+- After a run, nothing matching the user's rules is left on the account.
+- Nothing outside the rules is removed.
 
 ## Open questions
 
 - Data source: X API, the user's downloaded X archive, or both?
-- Scope: do replies, reposts, and quote posts count as posts? Likes?
-- Backup: export posts before deleting?
+- Wider scope: do bookmarks, follows, lists, or DMs count as content to clean?
+- Backup: export content before removing it?

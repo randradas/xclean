@@ -1,6 +1,6 @@
 # xclean
 
-Tool to clean up a user's X posts
+Bulk-remove your own X content and activity, chosen by rules you set, with a preview first.
 
 Stack: TODO: list languages, frameworks, infra
 

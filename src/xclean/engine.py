@@ -108,6 +108,7 @@ class Engine:
                     return Ending.REFUSED
                 case Outcome.FAILED:
                     store.mark(run_id, item.id, ItemStatus.FAILED, result.reason)
+                    self._refusals = 0
                     return None
                 case Outcome.RATE_LIMITED:
                     floor = RATE_WINDOW if rate_limited else MIN_RATE_WAIT

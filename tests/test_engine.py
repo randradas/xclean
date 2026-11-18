@@ -178,6 +178,17 @@ def test_one_refusal_fails_that_post_only(store: SqliteStore) -> None:
     assert store.counts(run).done == 1
 
 
+def test_refusals_split_by_other_answers_do_not_stop_the_run(store: SqliteStore) -> None:
+    """Only refusals truly in a row count (R24)."""
+    run = start(store, "1", "2", "3", "4")
+    refused = Result(Outcome.REFUSED, "403: not allowed")
+    remover = FakeRemover(
+        {"1": [refused], "2": [Result(Outcome.FAILED, "400: bad")], "3": [refused], "4": [refused]}
+    )
+    assert Engine(store, remover, FakeClock()).run(run) is Ending.FINISHED
+    assert store.counts(run).failed == 4
+
+
 def test_refusals_in_a_row_stop_the_run(store: SqliteStore) -> None:
     """X may answer 403 when credits run out: stop instead of failing every post (R10, AC22)."""
     ids = [str(i) for i in range(1, 7)]

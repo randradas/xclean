@@ -20,7 +20,7 @@ from xclean.auth import (
     start_login,
     wait_for_callback,
 )
-from xclean.tokens import MemoryTokenStore, TokenSet
+from xclean.tokens import FileTokenStore, MemoryTokenStore, TokenSet
 from xclean.xclient import REVOKE_URL, TOKEN_URL
 
 REDIRECT = "http://127.0.0.1:8765/callback"
@@ -180,3 +180,10 @@ def test_config_round_trip(tmp_path: Path) -> None:
     assert config.load(path) == config.Config()
     config.save(path, config.Config(client_id="cid"))
     assert config.load(path) == config.Config(client_id="cid", redirect_uri=REDIRECT)
+
+
+def test_logout_survives_broken_token_file(tmp_path: Path) -> None:
+    store = FileTokenStore(tmp_path / "tokens.json")
+    store.path.write_text("not json")
+    logout(store, "cid")
+    assert not store.path.exists()

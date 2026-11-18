@@ -149,3 +149,55 @@ def test_rate_limited_refresh_is_temporary_not_logged_out() -> None:
     store = MemoryTokenStore(tokens(expires_in=timedelta(0)))
     client = XClient(UserTokens(store, client_id="cid", now=lambda: NOW))
     assert client.delete_post("1").outcome is Outcome.TEMPORARY
+
+
+# Saving tokens must never lose the rotated refresh token (R4)
+
+
+def test_file_store_keeps_old_tokens_if_write_fails(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    store = FileTokenStore(tmp_path / "data" / "tokens.json")
+    store.save(tokens())
+
+    def broken_replace(*_: object) -> None:
+        raise OSError("disk full")
+
+    monkeypatch.setattr("os.replace", broken_replace)
+    with pytest.raises(OSError):
+        store.save(tokens(expires_in=timedelta(hours=5)))
+    assert store.load() == tokens()
+    assert list(store.path.parent.iterdir()) == [store.path]
+
+
+def test_broken_token_file_reads_as_logged_out(tmp_path: Path) -> None:
+    store = FileTokenStore(tmp_path / "tokens.json")
+    store.path.write_text('{"access_token": "a1", "refr')
+    assert store.load() is None
+
+
+class FailingSaveStore(MemoryTokenStore):
+    def __init__(self, tokens: TokenSet) -> None:
+        super().__init__(tokens)
+        self.fail = True
+
+    def save(self, tokens: TokenSet) -> None:
+        if self.fail:
+            raise OSError("keychain locked")
+        super().save(tokens)
+
+
+@respx.mock
+def test_failed_save_keeps_new_tokens_in_memory_and_saves_later() -> None:
+    route = respx.post(TOKEN_URL).respond(
+        200, json={"access_token": "a2", "refresh_token": "r2", "expires_in": 7200}
+    )
+    store = FailingSaveStore(tokens(expires_in=timedelta(0)))
+    user = UserTokens(store, client_id="cid", now=lambda: NOW)
+    assert user.access_token() == "a2"
+    assert user.access_token() == "a2"
+    assert route.call_count == 1
+    store.fail = False
+    user.access_token()
+    saved = store.load()
+    assert saved is not None and saved.refresh_token == "r2"

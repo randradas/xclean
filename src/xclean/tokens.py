@@ -51,6 +51,14 @@ class TokenSet:
         )
 
 
+def _parse(text: str) -> TokenSet | None:
+    """None for a broken saved value: the user just logs in again."""
+    try:
+        return TokenSet.from_json(text)
+    except (ValueError, KeyError, TypeError):
+        return None
+
+
 class TokenStore(Protocol):
     def load(self) -> TokenSet | None: ...
     def save(self, tokens: TokenSet) -> None: ...
@@ -74,7 +82,7 @@ class MemoryTokenStore:
 class KeyringTokenStore:
     def load(self) -> TokenSet | None:
         text = keyring.get_password(_SERVICE, _KEY)
-        return TokenSet.from_json(text) if text else None
+        return _parse(text) if text else None
 
     def save(self, tokens: TokenSet) -> None:
         keyring.set_password(_SERVICE, _KEY, tokens.to_json())
@@ -90,16 +98,24 @@ class FileTokenStore:
 
     def load(self) -> TokenSet | None:
         try:
-            return TokenSet.from_json(self.path.read_text())
+            return _parse(self.path.read_text())
         except FileNotFoundError:
             return None
 
     def save(self, tokens: TokenSet) -> None:
+        """Write a new file, then swap it in, so a failure never leaves a half-written file."""
         self.path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
-        fd = os.open(self.path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
-        with os.fdopen(fd, "w") as f:
-            f.write(tokens.to_json())
-        self.path.chmod(0o600)
+        new = self.path.with_name(f".{self.path.name}.new")
+        fd = os.open(new, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        try:
+            with os.fdopen(fd, "w") as f:
+                f.write(tokens.to_json())
+                f.flush()
+                os.fsync(f.fileno())
+            new.chmod(0o600)
+            os.replace(new, self.path)
+        finally:
+            new.unlink(missing_ok=True)
 
     def clear(self) -> None:
         self.path.unlink(missing_ok=True)
@@ -156,8 +172,24 @@ class UserTokens:
         self._client_id = client_id
         self._http = http
         self._now = now
+        self._unsaved: TokenSet | None = None  # refreshed tokens the store has not taken yet
+
+    def _save(self, tokens: TokenSet) -> None:
+        """X rotates refresh tokens, so after a refresh only the new set works.
+
+        If the store fails, keep the new set in memory and try again on the next use.
+        """
+        try:
+            self._store.save(tokens)
+        except Exception:
+            self._unsaved = tokens
+        else:
+            self._unsaved = None
 
     def _load(self) -> TokenSet:
+        if (unsaved := self._unsaved) is not None:
+            self._save(unsaved)
+            return unsaved
         tokens = self._store.load()
         if tokens is None:
             raise NotLoggedIn("not logged in; run `xclean login`")
@@ -182,5 +214,5 @@ class UserTokens:
         except NotLoggedIn:
             raise NotLoggedIn("login expired or was revoked; run `xclean login`") from None
         tokens = token_set_from_response(body, self._now(), old.refresh_token)
-        self._store.save(tokens)
+        self._save(tokens)
         return tokens.access_token

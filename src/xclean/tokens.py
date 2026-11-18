@@ -24,6 +24,8 @@ from xclean.xclient import NotLoggedIn, request_tokens
 _SERVICE = "xclean"
 _KEY = "tokens"
 _MARGIN = timedelta(minutes=1)  # refresh a bit before expiry
+_DEFAULT_LIFETIME = 7200
+_MAX_LIFETIME = 60 * 60 * 24 * 365
 
 
 @dataclass(frozen=True)
@@ -138,12 +140,19 @@ def default_token_store(
 def token_set_from_response(
     body: dict[str, object], now: datetime, old_refresh: str = ""
 ) -> TokenSet:
-    expires_in = body.get("expires_in", 7200)
     return TokenSet(
         access_token=str(body["access_token"]),
         refresh_token=str(body.get("refresh_token") or old_refresh),
-        expires_at=now + timedelta(seconds=int(str(expires_in))),
+        expires_at=now + timedelta(seconds=_lifetime(body.get("expires_in"))),
     )
+
+
+def _lifetime(expires_in: object) -> int:
+    """Seconds the access token lives. X's usual 2 hours when the answer is unusable: the
+    tokens must be kept anyway, and a wrong guess only costs one 401 and a refresh."""
+    if type(expires_in) is int and 0 < expires_in <= _MAX_LIFETIME:
+        return expires_in
+    return _DEFAULT_LIFETIME
 
 
 class UserTokens:

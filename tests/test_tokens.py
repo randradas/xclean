@@ -212,3 +212,18 @@ def test_token_file_that_is_not_text_reads_as_logged_out(tmp_path: Path) -> None
     store = FileTokenStore(tmp_path / "tokens.json")
     store.path.write_bytes(b"\xff\xfe\x00junk")
     assert store.load() is None
+
+
+@respx.mock
+@pytest.mark.parametrize("expires_in", [None, "soon", -5, 1.5e20, True])
+def test_bad_expiry_keeps_the_new_tokens(expires_in: object) -> None:
+    """X already rotated the refresh token: dropping the answer would log the user out (R23)."""
+    respx.post(TOKEN_URL).respond(
+        200, json={"access_token": "a2", "refresh_token": "r2", "expires_in": expires_in}
+    )
+    store = MemoryTokenStore(tokens(expires_in=timedelta(0)))
+    user = UserTokens(store, client_id="cid", now=lambda: NOW)
+    assert user.access_token() == "a2"
+    saved = store.load()
+    assert saved is not None and saved.refresh_token == "r2"
+    assert saved.expires_at == NOW + timedelta(seconds=7200)

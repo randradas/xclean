@@ -8,7 +8,8 @@ Check: `uv run ruff format && uv run ruff check && uv run mypy && uv run pytest`
 ## How we work
 
 Spec driven. No code without an approved spec.
-Flow: `/spec` -> `/plan` -> `/tasks` -> `/implement`. Details: `specs/README.md`.
+Flow: `/spec` -> `/plan` -> `/tasks` -> `/implement` (with `/review` after each task group).
+Details: `specs/README.md`.
 
 ## Where to look (read only what the task needs)
 

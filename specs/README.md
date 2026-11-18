@@ -14,11 +14,14 @@ Each feature lives in `specs/NNN-slug/` with three files:
 - `/spec` and `/plan` grill the user (`grill` skill) until no decision is open.
 - Human approves the spec before planning, and the plan before tasks.
 - Open questions go in `## Open questions`, never guessed.
+- After each task group, `/review` checks the code in fresh contexts (bugs, spec, standards).
+  The human triages findings into R tasks under `## Review` in `tasks.md`; a fresh context checks
+  the fixes.
 
 ## Ids
 
 - Decisions: `D1`, `D2`... unique per spec folder; `plan.md` continues from the spec's last id.
-- Acceptance criteria: `AC1`, `AC2`... Tasks: `T1`, `T2`...
+- Acceptance criteria: `AC1`, `AC2`... Tasks: `T1`, `T2`... Review findings: `R1`, `R2`...
 - While `draft`, renumber freely. Once `approved`, ids are frozen: a dropped item stays, struck out
   (`~~AC3: ...~~ dropped`), and its id is never reused.
 
@@ -26,6 +29,7 @@ Each feature lives in `specs/NNN-slug/` with three files:
 
 - Approving a spec or plan: commit `<spec id>: approve spec` / `<spec id>: approve plan`.
 - Each finished task, after tests pass: commit `<spec id>: <task number> <summary>`.
+- Review: `<spec id>: review <n> findings`, each fix `<spec id>: R<n> <summary>`.
 - Never push; that is the user's call.
 - Not a git repo: skip commits.
 

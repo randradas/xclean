@@ -13,7 +13,6 @@ import respx
 
 from xclean import config
 from xclean.auth import (
-    REVOKE_URL,
     LoginError,
     code_from_callback,
     login,
@@ -21,7 +20,8 @@ from xclean.auth import (
     start_login,
     wait_for_callback,
 )
-from xclean.tokens import TOKEN_URL, MemoryTokenStore, TokenSet
+from xclean.tokens import MemoryTokenStore, TokenSet
+from xclean.xclient import REVOKE_URL, TOKEN_URL
 
 REDIRECT = "http://127.0.0.1:8765/callback"
 

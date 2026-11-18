@@ -19,9 +19,8 @@ import keyring.backends.fail
 import keyring.backends.null
 from keyring.errors import KeyringError
 
-from xclean.xclient import NotLoggedIn, TemporaryError
+from xclean.xclient import NotLoggedIn, request_tokens
 
-TOKEN_URL = "https://api.x.com/2/oauth2/token"
 _SERVICE = "xclean"
 _KEY = "tokens"
 _MARGIN = timedelta(minutes=1)  # refresh a bit before expiry
@@ -155,7 +154,7 @@ class UserTokens:
     ) -> None:
         self._store = store
         self._client_id = client_id
-        self._http = http or httpx.Client(timeout=30)
+        self._http = http
         self._now = now
 
     def _load(self) -> TokenSet:
@@ -172,19 +171,16 @@ class UserTokens:
 
     def refresh(self) -> str:
         old = self._load()
-        # Network errors propagate: the X client treats them as temporary.
-        response = self._http.post(
-            TOKEN_URL,
-            data={
-                "grant_type": "refresh_token",
-                "refresh_token": old.refresh_token,
-                "client_id": self._client_id,
-            },
-        )
-        if response.status_code >= 500:
-            raise TemporaryError(f"X login service answered {response.status_code}")
-        if response.status_code != 200:
-            raise NotLoggedIn("login expired or was revoked; run `xclean login`")
-        tokens = token_set_from_response(response.json(), self._now(), old.refresh_token)
+        # Network and temporary errors propagate: the X client retries them later.
+        data = {
+            "grant_type": "refresh_token",
+            "refresh_token": old.refresh_token,
+            "client_id": self._client_id,
+        }
+        try:
+            body = request_tokens(data, self._http)
+        except NotLoggedIn:
+            raise NotLoggedIn("login expired or was revoked; run `xclean login`") from None
+        tokens = token_set_from_response(body, self._now(), old.refresh_token)
         self._store.save(tokens)
         return tokens.access_token

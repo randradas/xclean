@@ -1,5 +1,6 @@
 """The only code that talks HTTP to X. Everything else sees simple results."""
 
+import contextlib
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from enum import Enum
@@ -8,6 +9,8 @@ from typing import Any, Protocol
 import httpx
 
 API = "https://api.x.com"
+TOKEN_URL = f"{API}/2/oauth2/token"
+REVOKE_URL = f"{API}/2/oauth2/revoke"
 _NOT_FOUND = "https://api.x.com/2/problems/resource-not-found"
 _CREDITS = "https://api.x.com/2/problems/credits-depleted"
 _DEFAULT_WAIT = timedelta(minutes=15)
@@ -84,6 +87,28 @@ def _problem_types(response: httpx.Response) -> set[str]:
     types = {str(e.get("type", "")) for e in _errors(body)}
     types.add(str(body.get("type", "")))
     return types
+
+
+def request_tokens(data: dict[str, str], http: httpx.Client | None = None) -> dict[str, Any]:
+    """Ask X's token endpoint for tokens (login code or refresh). Network errors propagate.
+
+    TemporaryError when X fails; NotLoggedIn when it refuses.
+    """
+    response = (http or httpx.Client(timeout=30)).post(TOKEN_URL, data=data)
+    if response.status_code >= 500:
+        raise TemporaryError(f"X login service answered {response.status_code}")
+    if response.status_code != 200:
+        raise NotLoggedIn(f"X refused the tokens request ({response.status_code})")
+    body: dict[str, Any] = response.json()
+    return body
+
+
+def revoke_tokens(tokens: list[str], client_id: str, http: httpx.Client | None = None) -> None:
+    """Best effort: a network failure is ignored."""
+    http = http or httpx.Client(timeout=30)
+    for token in tokens:
+        with contextlib.suppress(httpx.TransportError):
+            http.post(REVOKE_URL, data={"token": token, "client_id": client_id})
 
 
 class XClient:

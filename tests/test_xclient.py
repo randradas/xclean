@@ -1,4 +1,5 @@
 from datetime import UTC, datetime
+from pathlib import Path
 
 import httpx
 import pytest
@@ -157,3 +158,9 @@ def test_odd_error_body_is_failed_not_crash(client: XClient, errors: object) -> 
     result = client.delete_post("123")
     assert result.outcome is Outcome.FAILED
     assert result.reason.startswith("400:")
+
+
+def test_only_the_x_client_builds_http_clients() -> None:
+    src = Path(__file__).parents[1] / "src" / "xclean"
+    builders = [p.name for p in src.rglob("*.py") if "httpx.Client(" in p.read_text()]
+    assert builders == ["xclient.py"]

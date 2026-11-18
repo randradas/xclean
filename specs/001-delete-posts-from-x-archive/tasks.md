@@ -96,7 +96,7 @@ Filled by `/review` after each task group. Open R tasks come before the next T t
   message. (spec; AC22)
 - [ ] R11: `retry-failed` keeps the old run message. (spec; AC21)
 - [ ] R12: Duplicate post IDs in a selection crash the run start; drop duplicates. (spec; AC18)
-- [ ] R13: Token exchange, refresh and revoke send HTTP outside the X client; move them in.
+- [x] R13: Token exchange, refresh and revoke send HTTP outside the X client; move them in.
   Callback server stays in `auth.py` (D14). (standards; D13)
 - [ ] R14: Move `MemoryTokenStore` test double out of production code. (standards)
 - [ ] R15: Rename `Remover` to the glossary term, content type. (standards)

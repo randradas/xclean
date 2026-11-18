@@ -5,7 +5,6 @@ browser ended on.
 """
 
 import base64
-import contextlib
 import hashlib
 import secrets
 import time
@@ -17,10 +16,10 @@ from urllib.parse import parse_qs, urlencode, urlparse
 
 import httpx
 
-from xclean.tokens import TOKEN_URL, TokenSet, TokenStore, token_set_from_response
+from xclean.tokens import TokenSet, TokenStore, token_set_from_response
+from xclean.xclient import NotLoggedIn, TemporaryError, request_tokens, revoke_tokens
 
 AUTHORIZE_URL = "https://x.com/i/oauth2/authorize"
-REVOKE_URL = "https://api.x.com/2/oauth2/revoke"
 SCOPES = ("tweet.read", "tweet.write", "users.read", "offline.access")
 
 
@@ -77,20 +76,18 @@ def finish_login(
     store: TokenStore,
     http: httpx.Client | None = None,
 ) -> TokenSet:
-    http = http or httpx.Client(timeout=30)
-    response = http.post(
-        TOKEN_URL,
-        data={
-            "grant_type": "authorization_code",
-            "code": code,
-            "redirect_uri": redirect_uri,
-            "code_verifier": request.verifier,
-            "client_id": client_id,
-        },
-    )
-    if response.status_code != 200:
-        raise LoginError(f"X did not accept the login code ({response.status_code})")
-    tokens = token_set_from_response(response.json(), datetime.now(UTC))
+    data = {
+        "grant_type": "authorization_code",
+        "code": code,
+        "redirect_uri": redirect_uri,
+        "code_verifier": request.verifier,
+        "client_id": client_id,
+    }
+    try:
+        body = request_tokens(data, http)
+    except (NotLoggedIn, TemporaryError) as e:
+        raise LoginError(f"X did not accept the login code: {e}") from None
+    tokens = token_set_from_response(body, datetime.now(UTC))
     store.save(tokens)
     return tokens
 
@@ -99,10 +96,7 @@ def logout(store: TokenStore, client_id: str, http: httpx.Client | None = None) 
     """Revoke at X (best effort) and forget the tokens locally."""
     tokens = store.load()
     if tokens:
-        http = http or httpx.Client(timeout=30)
-        for token in (tokens.refresh_token, tokens.access_token):
-            with contextlib.suppress(httpx.TransportError):
-                http.post(REVOKE_URL, data={"token": token, "client_id": client_id})
+        revoke_tokens([tokens.refresh_token, tokens.access_token], client_id, http)
     store.clear()
 
 

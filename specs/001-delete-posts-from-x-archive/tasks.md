@@ -117,3 +117,19 @@ Filled by `/review` after each task group. Open R tasks come before the next T t
   (X already rotated them) and assume 2 hours. (bugs; from R2 check)
 - [x] R24: The 403 counter resets only on success, so 403s with other answers between them
   still stop the run; reset on any other answer. (bugs; from R10 check)
+
+### Review 2: mutation trial on `engine.py` (at 9ee4b96)
+
+- [ ] R26: Spending limit and not logged in return the right ending, but no test checks the run
+  is saved STOPPED with X's message. (mutation; AC22)
+- [ ] R27: No test checks the stored `wait_until` and message while a resumed run waits out an
+  old rate limit, or during a rate-limit wait in the loop. (mutation; AC19, AC20)
+- [ ] R28: No test proves the 403 counter resets to zero after a success or a run-out retry
+  (refuse, refuse, other, refuse, refuse goes on). (mutation; AC22)
+- [ ] R29: `set_state` and other run updates silently change nothing for an unknown run id;
+  raise instead. (mutation)
+- [ ] R30: Stored messages ("interrupted", "rate limit", the 403 reason) are not asserted.
+  (mutation)
+- ~~R31: `RealClock` has no tests.~~ skipped: thin wrapper over the system clock.
+- ~~R32: `rate_limited` count mutants and `>=` at `engine.py:71` survive.~~ skipped: equivalent,
+  same behaviour.

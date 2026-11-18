@@ -64,17 +64,25 @@ def _body(response: httpx.Response) -> dict[str, Any]:
     return body if isinstance(body, dict) else {}
 
 
+def _errors(body: dict[str, Any]) -> list[dict[str, Any]]:
+    """The `errors` entries that are objects; X bodies are not always well formed."""
+    errors = body.get("errors")
+    if not isinstance(errors, list):
+        return []
+    return [e for e in errors if isinstance(e, dict)]
+
+
 def _detail(response: httpx.Response) -> str:
     body = _body(response)
-    errors = body.get("errors") or [{}]
-    text = body.get("detail") or errors[0].get("detail") or errors[0].get("message")
+    first = (_errors(body) or [{}])[0]
+    text = body.get("detail") or first.get("detail") or first.get("message")
     return f"{response.status_code}: {text or response.reason_phrase}"
 
 
 def _problem_types(response: httpx.Response) -> set[str]:
     body = _body(response)
-    types = {e.get("type", "") for e in body.get("errors") or []}
-    types.add(body.get("type", ""))
+    types = {str(e.get("type", "")) for e in _errors(body)}
+    types.add(str(body.get("type", "")))
     return types
 
 

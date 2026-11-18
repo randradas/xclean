@@ -148,3 +148,12 @@ def test_me(client: XClient) -> None:
         200, json={"data": {"id": "42", "username": "someone", "pinned_tweet_id": "7"}}
     )
     assert client.me() == Me(id="42", username="someone", pinned_post_id="7")
+
+
+@respx.mock
+@pytest.mark.parametrize("errors", ["oops", ["oops"], [None], 7])
+def test_odd_error_body_is_failed_not_crash(client: XClient, errors: object) -> None:
+    respx.delete(DELETE).respond(400, json={"errors": errors})
+    result = client.delete_post("123")
+    assert result.outcome is Outcome.FAILED
+    assert result.reason.startswith("400:")

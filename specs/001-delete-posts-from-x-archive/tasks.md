@@ -80,7 +80,7 @@ Filled by `/review` after each task group. Open R tasks come before the next T t
 
 ### Review 1: T1-T16 (6ce922e..b5b93dd)
 
-- [ ] R1: Malformed X error body (`errors` not a list of objects) crashes the run on every
+- [x] R1: Malformed X error body (`errors` not a list of objects) crashes the run on every
   resume. (bugs)
 - [ ] R2: Non-JSON body from the token endpoint crashes the run; treat as temporary. (bugs)
 - [ ] R3: 429 on token refresh reports "login expired"; treat as temporary. (bugs)

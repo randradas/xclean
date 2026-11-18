@@ -98,7 +98,7 @@ Filled by `/review` after each task group. Open R tasks come before the next T t
 - [x] R12: Duplicate post IDs in a selection crash the run start; drop duplicates. (spec; AC18)
 - [x] R13: Token exchange, refresh and revoke send HTTP outside the X client; move them in.
   Callback server stays in `auth.py` (D14). (standards; D13)
-- [ ] R14: Move `MemoryTokenStore` test double out of production code. (standards)
+- [x] R14: Move `MemoryTokenStore` test double out of production code. (standards)
 - [ ] R15: Rename `Remover` to the glossary term, content type. (standards)
 - ~~R16: Run lock not taken by the engine.~~ moved to T22.
 - ~~R17: Time estimate is zero for small runs.~~ moved to T20.

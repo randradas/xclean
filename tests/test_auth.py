@@ -10,6 +10,7 @@ from urllib.parse import parse_qs, urlparse
 import httpx
 import pytest
 import respx
+from fakes import MemoryTokenStore
 
 from xclean import config
 from xclean.auth import (
@@ -20,7 +21,7 @@ from xclean.auth import (
     start_login,
     wait_for_callback,
 )
-from xclean.tokens import FileTokenStore, MemoryTokenStore, TokenSet
+from xclean.tokens import FileTokenStore, TokenSet
 from xclean.xclient import REVOKE_URL, TOKEN_URL
 
 REDIRECT = "http://127.0.0.1:8765/callback"

@@ -65,20 +65,6 @@ class TokenStore(Protocol):
     def clear(self) -> None: ...
 
 
-class MemoryTokenStore:
-    def __init__(self, tokens: TokenSet | None = None) -> None:
-        self._tokens = tokens
-
-    def load(self) -> TokenSet | None:
-        return self._tokens
-
-    def save(self, tokens: TokenSet) -> None:
-        self._tokens = tokens
-
-    def clear(self) -> None:
-        self._tokens = None
-
-
 class KeyringTokenStore:
     def load(self) -> TokenSet | None:
         text = keyring.get_password(_SERVICE, _KEY)

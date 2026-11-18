@@ -6,10 +6,11 @@ from urllib.parse import parse_qs
 import httpx
 import pytest
 import respx
+from fakes import MemoryTokenStore
 
+from xclean import tokens as tokens_module
 from xclean.tokens import (
     FileTokenStore,
-    MemoryTokenStore,
     TokenSet,
     UserTokens,
     default_token_store,
@@ -201,3 +202,7 @@ def test_failed_save_keeps_new_tokens_in_memory_and_saves_later() -> None:
     user.access_token()
     saved = store.load()
     assert saved is not None and saved.refresh_token == "r2"
+
+
+def test_no_test_doubles_in_production_code() -> None:
+    assert not hasattr(tokens_module, "MemoryTokenStore")

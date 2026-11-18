@@ -84,13 +84,13 @@ Filled by `/review` after each task group. Open R tasks come before the next T t
   resume. (bugs)
 - [x] R2: Non-JSON body from the token endpoint crashes the run; treat as temporary. (bugs)
 - [x] R3: 429 on token refresh reports "login expired"; treat as temporary. (bugs)
-- [x] R4: Token save failure after refresh loses the rotated refresh token; write atomically,
+- [ ] R4: Token save failure after refresh loses the rotated refresh token; write atomically,
   and `logout` survives a broken token file. (bugs)
 - [x] R5: Local clock ahead of X turns rate-limit waits into ~1 s retries; set a minimum wait,
   one shared default wait. (bugs; AC19)
 - [x] R6: Resume ignores a stored future `wait_until`. (bugs; AC19, AC20)
 - [x] R7: `me()` crashes with KeyError when the reply has no `data`. (bugs)
-- [x] R8: `config.save` writes broken TOML when a value contains `"`. (bugs)
+- [ ] R8: `config.save` writes broken TOML when a value contains `"`. (bugs)
 - [x] R9: Store database and lock file readable by other users; make them owner-only. (bugs)
 - [x] R10: 403 when credits run out marks posts failed and continues; one 403 fails that post,
   three in a row stop the run with X's message. (spec; AC22)
@@ -99,7 +99,8 @@ Filled by `/review` after each task group. Open R tasks come before the next T t
 - [x] R13: Token exchange, refresh and revoke send HTTP outside the X client; move them in.
   Callback server stays in `auth.py` (D14). (standards; D13)
 - [x] R14: Move `MemoryTokenStore` test double out of production code. (standards)
-- [ ] R15: Rename `Remover` to the glossary term, content type. (standards)
+- ~~R15: Rename `Remover` to the glossary term, content type.~~ skipped: `ContentType` is
+  already the enum in `model.py`; `Remover` says what it does.
 - ~~R16: Run lock not taken by the engine.~~ moved to T22.
 - ~~R17: Time estimate is zero for small runs.~~ moved to T20.
 - ~~R18: Billing of already-gone and failed deletes is a guess.~~ moved to T26.
@@ -110,3 +111,7 @@ Filled by `/review` after each task group. Open R tasks come before the next T t
   generic `_removal_result`, unused `RateLimit.daily`, Ending vs Outcome, engine imports
   `xclient`).~~ skipped: judgement calls, not worth the churn.
 - ~~R22: No `tests/fixtures/` folder.~~ skipped: T17 creates it.
+- [ ] R23: Token reply with a bad `expires_in` (null, text) crashes the run; treat as temporary.
+  (bugs; from R2 check)
+- [ ] R24: The 403 counter resets only on success, so 403s with other answers between them
+  still stop the run; reset on any other answer. (bugs; from R10 check)

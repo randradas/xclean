@@ -141,3 +141,11 @@ def test_unreadable_refresh_answer_is_temporary(answer: httpx.Response) -> None:
     client = XClient(UserTokens(store, client_id="cid", now=lambda: NOW))
     assert client.delete_post("1").outcome is Outcome.TEMPORARY
     assert store.load() == tokens(expires_in=timedelta(0))
+
+
+@respx.mock
+def test_rate_limited_refresh_is_temporary_not_logged_out() -> None:
+    respx.post(TOKEN_URL).respond(429)
+    store = MemoryTokenStore(tokens(expires_in=timedelta(0)))
+    client = XClient(UserTokens(store, client_id="cid", now=lambda: NOW))
+    assert client.delete_post("1").outcome is Outcome.TEMPORARY

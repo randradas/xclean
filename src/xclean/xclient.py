@@ -95,7 +95,7 @@ def request_tokens(data: dict[str, str], http: httpx.Client | None = None) -> di
     TemporaryError when X fails; NotLoggedIn when it refuses.
     """
     response = (http or httpx.Client(timeout=30)).post(TOKEN_URL, data=data)
-    if response.status_code >= 500:
+    if response.status_code >= 500 or response.status_code == 429:
         raise TemporaryError(f"X login service answered {response.status_code}")
     if response.status_code != 200:
         raise NotLoggedIn(f"X refused the tokens request ({response.status_code})")

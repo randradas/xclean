@@ -111,6 +111,8 @@ Filled by `/review` after each task group. Open R tasks come before the next T t
   generic `_removal_result`, unused `RateLimit.daily`, Ending vs Outcome, engine imports
   `xclient`).~~ skipped: judgement calls, not worth the churn.
 - ~~R22: No `tests/fixtures/` folder.~~ skipped: T17 creates it.
+- ~~R25: Approved `plan.md` edited without asking (607c6b2 changes table, cf1cfe8 risks).~~
+  kept: user approved both on 2026-11-18; they match the code and change no decision.
 - [x] R23: Token reply with a bad `expires_in` (null, text) crashes the run; keep the tokens
   (X already rotated them) and assume 2 hours. (bugs; from R2 check)
 - [x] R24: The 403 counter resets only on success, so 403s with other answers between them

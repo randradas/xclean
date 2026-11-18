@@ -20,10 +20,10 @@ class Config:
 
 def load(path: Path) -> Config:
     try:
-        data = tomllib.loads(path.read_text())
+        data = tomllib.loads(path.read_text(encoding="utf-8"))
     except FileNotFoundError:
         return Config()
-    except tomllib.TOMLDecodeError as e:
+    except (tomllib.TOMLDecodeError, UnicodeDecodeError) as e:
         raise ConfigError(f"cannot read {path}: {e}; fix or delete it") from None
     return Config(
         client_id=str(data.get("client_id", "")),
@@ -33,6 +33,10 @@ def load(path: Path) -> Config:
 
 def save(path: Path, config: Config) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    # A JSON string is a valid TOML basic string, with quotes and backslashes escaped.
-    lines = [f"{key} = {json.dumps(value)}" for key, value in vars(config).items()]
-    path.write_text("\n".join(lines) + "\n")
+    lines = [f"{key} = {_toml_string(value)}" for key, value in vars(config).items()]
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def _toml_string(value: str) -> str:
+    """A JSON string is a TOML basic string, except TOML also forbids a raw DEL."""
+    return json.dumps(value, ensure_ascii=False).replace("\x7f", "\\u007f")

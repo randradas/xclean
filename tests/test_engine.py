@@ -148,6 +148,28 @@ def test_reset_in_the_past_still_waits_a_minimum(store: SqliteStore) -> None:
     assert store.counts(run).done == 1
 
 
+class StopDuringWait(FakeClock):
+    def sleep_until(self, when: datetime) -> None:
+        raise KeyboardInterrupt
+
+
+def test_resume_honours_a_stored_wait(store: SqliteStore) -> None:
+    """Stopped mid-wait: resume waits out the rest before sending anything (R6)."""
+    run = start(store, "1")
+    reset = START + timedelta(minutes=12)
+    first = FakeRemover({"1": [Result(Outcome.RATE_LIMITED, reset_at=reset)]})
+    with pytest.raises(KeyboardInterrupt):
+        Engine(store, first, StopDuringWait()).run(run)
+    assert store.get_run(run).wait_until == reset
+
+    second = FakeRemover()
+    clock = FakeClock()
+    clock.t = START + timedelta(minutes=2)
+    Engine(store, second, clock).run(run)
+    assert clock.sleeps == [reset]
+    assert second.calls == ["1"]
+
+
 def test_spending_limit_stops_cleanly_and_resumes(store: SqliteStore) -> None:
     run = start(store, "1", "2")
     remover = FakeRemover({"2": [Result(Outcome.SPENDING_LIMIT, "402: credits depleted")]})

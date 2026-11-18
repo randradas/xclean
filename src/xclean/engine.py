@@ -62,13 +62,20 @@ class Engine:
         """Work through pending items. Ctrl-C leaves the run stopped and resumable."""
         store = self._store
         try:
+            # A run stopped mid-wait waits out the rest before sending anything.
+            until = store.get_run(run_id).wait_until
+            if until is not None and until > self._clock.now():
+                store.set_state(run_id, RunState.WAITING, wait_until=until, message="rate limit")
+                self._on_progress()
+                self._clock.sleep_until(until)
             store.set_state(run_id, RunState.WORKING)
             for item in store.pending(run_id):
                 if (ending := self._remove_one(run_id, item)) is not None:
                     return ending
                 self._on_progress()
         except BaseException:
-            store.set_state(run_id, RunState.STOPPED, message="interrupted")
+            until = store.get_run(run_id).wait_until
+            store.set_state(run_id, RunState.STOPPED, wait_until=until, message="interrupted")
             raise
         store.finish(run_id)
         self._on_progress()

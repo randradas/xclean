@@ -41,6 +41,13 @@ def _config_path() -> Path:
     return paths.config_dir() / "config.toml"
 
 
+def _config() -> config.Config:
+    try:
+        return config.load(_config_path())
+    except config.ConfigError as e:
+        raise _fail(str(e)) from None
+
+
 def _token_store() -> TokenStore:
     return default_token_store(paths.data_dir(), warn=lambda m: err.print(f"[yellow]{m}[/yellow]"))
 
@@ -58,7 +65,7 @@ def login(
     ] = None,
 ) -> None:
     """Log in to X in the browser. Remembered until you log out."""
-    cfg = config.load(_config_path())
+    cfg = _config()
     if client_id:
         cfg = config.Config(client_id=client_id, redirect_uri=cfg.redirect_uri)
         config.save(_config_path(), cfg)
@@ -84,7 +91,7 @@ def login(
 @app.command()
 def logout() -> None:
     """Log out and forget the login on this machine."""
-    cfg = config.load(_config_path())
+    cfg = _config()
     auth.logout(_token_store(), cfg.client_id)
     out.print("Logged out.")
 

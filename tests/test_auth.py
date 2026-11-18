@@ -187,3 +187,17 @@ def test_logout_survives_broken_token_file(tmp_path: Path) -> None:
     store.path.write_text("not json")
     logout(store, "cid")
     assert not store.path.exists()
+
+
+@pytest.mark.parametrize("client_id", ['a"b', "a\\b", "a\nb"])
+def test_config_round_trip_with_odd_characters(tmp_path: Path, client_id: str) -> None:
+    path = tmp_path / "config.toml"
+    config.save(path, config.Config(client_id=client_id))
+    assert config.load(path).client_id == client_id
+
+
+def test_broken_config_is_a_clear_error(tmp_path: Path) -> None:
+    path = tmp_path / "config.toml"
+    path.write_text('client_id = "unclosed\n')
+    with pytest.raises(config.ConfigError, match=str(path)):
+        config.load(path)

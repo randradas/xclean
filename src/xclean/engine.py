@@ -21,6 +21,8 @@ _BILLED = {Outcome.DELETED, Outcome.ALREADY_GONE, Outcome.FAILED}
 # X's reset time is X's clock. If ours runs ahead, the reset looks past: wait at least this,
 # and a full window when X still says no right after a wait.
 MIN_RATE_WAIT = timedelta(minutes=1)
+# One 403 fails that item. This many in a row means X refuses the app (often out of credits).
+REFUSALS_TO_STOP = 3
 
 
 class Clock(Protocol):
@@ -41,6 +43,7 @@ class Ending(Enum):
     FINISHED = "finished"
     SPENDING_LIMIT = "spending limit reached"
     NOT_LOGGED_IN = "not logged in"
+    REFUSED = "refused by X"
 
 
 class Engine:
@@ -61,6 +64,7 @@ class Engine:
     def run(self, run_id: int) -> Ending:
         """Work through pending items. Ctrl-C leaves the run stopped and resumable."""
         store = self._store
+        self._refusals = 0
         try:
             # A run stopped mid-wait waits out the rest before sending anything.
             until = store.get_run(run_id).wait_until
@@ -92,7 +96,16 @@ class Engine:
             match result.outcome:
                 case Outcome.DELETED | Outcome.ALREADY_GONE:
                     store.mark(run_id, item.id, ItemStatus.DONE)
+                    self._refusals = 0
                     return None
+                case Outcome.REFUSED:
+                    store.mark(run_id, item.id, ItemStatus.FAILED, result.reason)
+                    self._refusals += 1
+                    if self._refusals < REFUSALS_TO_STOP:
+                        return None
+                    message = f"X refused {REFUSALS_TO_STOP} in a row ({result.reason})"
+                    store.set_state(run_id, RunState.STOPPED, message=message)
+                    return Ending.REFUSED
                 case Outcome.FAILED:
                     store.mark(run_id, item.id, ItemStatus.FAILED, result.reason)
                     return None

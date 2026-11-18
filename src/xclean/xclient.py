@@ -38,6 +38,7 @@ class Outcome(Enum):
     SPENDING_LIMIT = "spending limit reached"
     TEMPORARY = "temporary error"
     NOT_LOGGED_IN = "not logged in"
+    REFUSED = "refused"  # 403: this item, or the whole app when credits run out
     FAILED = "failed"
 
 
@@ -150,6 +151,8 @@ class XClient:
             return Result(Outcome.SPENDING_LIMIT, _detail(response))
         if status == 401:
             return Result(Outcome.NOT_LOGGED_IN, "access token rejected; run `xclean login`")
+        if status == 403:
+            return Result(Outcome.REFUSED, _detail(response))
         if status >= 500:
             return Result(Outcome.TEMPORARY, _detail(response))
         if status != 200:

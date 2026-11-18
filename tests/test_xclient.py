@@ -115,12 +115,12 @@ def test_network_error_is_temporary(client: XClient) -> None:
 
 
 @respx.mock
-def test_403_is_failed_with_reason(client: XClient) -> None:
+def test_403_is_refused_with_reason(client: XClient) -> None:
     respx.delete(DELETE).respond(
         403, json={"title": "Forbidden", "detail": "You are not allowed to delete this Post."}
     )
     result = client.delete_post("123")
-    assert result.outcome is Outcome.FAILED
+    assert result.outcome is Outcome.REFUSED
     assert result.reason == "403: You are not allowed to delete this Post."
 
 

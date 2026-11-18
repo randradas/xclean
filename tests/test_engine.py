@@ -170,6 +170,28 @@ def test_resume_honours_a_stored_wait(store: SqliteStore) -> None:
     assert second.calls == ["1"]
 
 
+def test_one_refusal_fails_that_post_only(store: SqliteStore) -> None:
+    run = start(store, "1", "2")
+    remover = FakeRemover({"1": [Result(Outcome.REFUSED, "403: not allowed")]})
+    assert Engine(store, remover, FakeClock()).run(run) is Ending.FINISHED
+    assert store.counts(run).failed == 1
+    assert store.counts(run).done == 1
+
+
+def test_refusals_in_a_row_stop_the_run(store: SqliteStore) -> None:
+    """X may answer 403 when credits run out: stop instead of failing every post (R10, AC22)."""
+    ids = [str(i) for i in range(1, 7)]
+    run = start(store, *ids)
+    refused = [Result(Outcome.REFUSED, "403: client forbidden")]
+    remover = FakeRemover({i: list(refused) for i in ids})
+    assert Engine(store, remover, FakeClock()).run(run) is Ending.REFUSED
+    assert remover.calls == ["1", "2", "3"]
+    stopped = store.get_run(run)
+    assert stopped.state is RunState.STOPPED
+    assert "403: client forbidden" in stopped.message
+    assert store.counts(run).pending == 3
+
+
 def test_spending_limit_stops_cleanly_and_resumes(store: SqliteStore) -> None:
     run = start(store, "1", "2")
     remover = FakeRemover({"2": [Result(Outcome.SPENDING_LIMIT, "402: credits depleted")]})

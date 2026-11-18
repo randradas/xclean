@@ -197,3 +197,8 @@ def test_requeue_clears_the_old_stop_message(store: SqliteStore) -> None:
     requeued = store.get_run(run.id)
     assert requeued.state is RunState.READY
     assert requeued.message == ""
+
+
+def test_duplicate_ids_are_removed_once(store: SqliteStore) -> None:
+    run = store.start_run(ACCOUNT, [post("1"), post("2"), post("1")], rules="all posts")
+    assert [i.id for i in store.pending(run.id)] == ["1", "2"]

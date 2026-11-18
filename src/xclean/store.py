@@ -94,6 +94,14 @@ def _ts(value: str | None) -> datetime | None:
     return datetime.fromisoformat(value) if value else None
 
 
+def _unique(items: Sequence[Item]) -> list[Item]:
+    """An ID listed twice is removed once; first one wins, order kept."""
+    seen: dict[str, Item] = {}
+    for item in items:
+        seen.setdefault(item.id, item)
+    return list(seen.values())
+
+
 class SqliteStore:
     def __init__(self, path: Path) -> None:
         self.path = path
@@ -157,7 +165,7 @@ class SqliteStore:
                         i.text,
                         ItemStatus.PENDING,
                     )
-                    for seq, i in enumerate(items)
+                    for seq, i in enumerate(_unique(items))
                 ],
             )
         return self.get_run(run_id)

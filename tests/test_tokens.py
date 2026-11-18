@@ -227,3 +227,13 @@ def test_bad_expiry_keeps_the_new_tokens(expires_in: object) -> None:
     saved = store.load()
     assert saved is not None and saved.refresh_token == "r2"
     assert saved.expires_at == NOW + timedelta(seconds=7200)
+
+
+@pytest.mark.parametrize(
+    "text",
+    ["[" * 100_000, '{"access_token": "a", "refresh_token": "r", "expires_at": "2030-01-01"}'],
+)
+def test_any_unusable_token_file_reads_as_logged_out(tmp_path: Path, text: str) -> None:
+    store = FileTokenStore(tmp_path / "tokens.json")
+    store.path.write_text(text)
+    assert store.load() is None

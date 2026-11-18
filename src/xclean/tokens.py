@@ -56,9 +56,10 @@ class TokenSet:
 def _parse(text: str) -> TokenSet | None:
     """None for a broken saved value: the user just logs in again."""
     try:
-        return TokenSet.from_json(text)
-    except (ValueError, KeyError, TypeError):
+        tokens = TokenSet.from_json(text)
+    except (ValueError, KeyError, TypeError, RecursionError):
         return None
+    return tokens if tokens.expires_at.tzinfo is not None else None
 
 
 class TokenStore(Protocol):
@@ -87,9 +88,7 @@ class FileTokenStore:
     def load(self) -> TokenSet | None:
         try:
             return _parse(self.path.read_text())
-        except FileNotFoundError:
-            return None
-        except UnicodeDecodeError:
+        except (OSError, UnicodeDecodeError):  # missing or unreadable
             return None
 
     def save(self, tokens: TokenSet) -> None:

@@ -51,7 +51,6 @@ ignore_missing_imports = true
 testpaths = ["tests"]
 
 [tool.mutmut]
-# xclient.py left out: its mutants crash the forked runner on macOS (mutmut 3.8.1).
-source_paths = ["src/xclean/engine.py", "src/xclean/store.py"]
+source_paths = ["src/xclean/engine.py", "src/xclean/store.py", "src/xclean/xclient.py"]
 also_copy = ["src/"]
 pytest_add_cli_args_test_selection = ["tests/"]

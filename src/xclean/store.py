@@ -5,6 +5,7 @@ Every write is committed at once: a result is saved before the next request is s
 """
 
 import fcntl
+import os
 import sqlite3
 from collections.abc import Iterator, Sequence
 from contextlib import AbstractContextManager, contextmanager
@@ -12,6 +13,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Protocol
 
+from xclean import paths
 from xclean.model import (
     ContentType,
     Counts,
@@ -95,6 +97,11 @@ def _ts(value: str | None) -> datetime | None:
 class SqliteStore:
     def __init__(self, path: Path) -> None:
         self.path = path
+        # Post text lives here: folder and files readable only by the user. SQLite gives the
+        # -wal and -shm files the same mode as the database file.
+        paths.ensure(path.parent)
+        os.close(os.open(path, os.O_RDWR | os.O_CREAT, 0o600))
+        path.chmod(0o600)
         self._db = sqlite3.connect(path, isolation_level=None)  # autocommit
         self._db.row_factory = sqlite3.Row
         self._db.execute("PRAGMA journal_mode=WAL")  # status can read while a run writes
@@ -263,7 +270,7 @@ class SqliteStore:
     def lock(self, account_id: str) -> Iterator[None]:
         """Hold while removing. The OS frees it if the process dies."""
         path = self.path.with_name(f"{self.path.name}.{account_id}.lock")
-        with path.open("w") as f:
+        with os.fdopen(os.open(path, os.O_WRONLY | os.O_CREAT, 0o600), "w") as f:
             try:
                 fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
             except BlockingIOError:

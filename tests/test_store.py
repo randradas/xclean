@@ -175,3 +175,15 @@ def test_requeue_with_no_failures_keeps_run_finished(store: SqliteStore) -> None
     store.finish(run.id)
     assert store.requeue_failed(run.id) == 0
     assert store.current_run(ACCOUNT) is None
+
+
+def test_store_files_are_private(tmp_path: Path) -> None:
+    """The store holds post text: only the user may read it (R9)."""
+    store = SqliteStore(tmp_path / "state" / "xclean.db")
+    store.start_run("42", [], rules="all posts")
+    with store.lock("42"):
+        files = list(store.path.parent.iterdir())
+        assert {f.name for f in files} >= {"xclean.db", "xclean.db-wal", "xclean.db.42.lock"}
+        for f in files:
+            assert f.stat().st_mode & 0o077 == 0, f.name
+    assert store.path.parent.stat().st_mode & 0o777 == 0o700

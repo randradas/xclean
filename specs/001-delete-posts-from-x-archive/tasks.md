@@ -90,7 +90,7 @@ Filled by `/review` after each task group. Open R tasks come before the next T t
   one shared default wait. (bugs; AC19)
 - [x] R6: Resume ignores a stored future `wait_until`. (bugs; AC19, AC20)
 - [x] R7: `me()` crashes with KeyError when the reply has no `data`. (bugs)
-- [ ] R8: `config.save` writes broken TOML when a value contains `"`. (bugs)
+- [x] R8: `config.save` writes broken TOML when a value contains `"`. (bugs)
 - [x] R9: Store database and lock file readable by other users; make them owner-only. (bugs)
 - [x] R10: 403 when credits run out marks posts failed and continues; one 403 fails that post,
   three in a row stop the run with X's message. (spec; AC22)

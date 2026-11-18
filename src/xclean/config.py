@@ -23,7 +23,7 @@ def load(path: Path) -> Config:
         data = tomllib.loads(path.read_text(encoding="utf-8"))
     except FileNotFoundError:
         return Config()
-    except (tomllib.TOMLDecodeError, UnicodeDecodeError) as e:
+    except (OSError, ValueError, RecursionError) as e:  # TOML and Unicode errors are ValueErrors
         raise ConfigError(f"cannot read {path}: {e}; fix or delete it") from None
     return Config(
         client_id=str(data.get("client_id", "")),
@@ -32,6 +32,11 @@ def load(path: Path) -> Config:
 
 
 def save(path: Path, config: Config) -> None:
+    for value in vars(config).values():
+        try:
+            value.encode("utf-8")
+        except UnicodeEncodeError:
+            raise ConfigError(f"not valid text: {value!r}") from None
     path.parent.mkdir(parents=True, exist_ok=True)
     lines = [f"{key} = {_toml_string(value)}" for key, value in vars(config).items()]
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")

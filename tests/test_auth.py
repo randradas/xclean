@@ -209,3 +209,19 @@ def test_config_that_is_not_text_is_a_clear_error(tmp_path: Path) -> None:
     path.write_bytes(b"\xff\xfe")
     with pytest.raises(config.ConfigError):
         config.load(path)
+
+
+def test_config_that_cannot_be_read_is_a_clear_error(tmp_path: Path) -> None:
+    folder = tmp_path / "config.toml"
+    folder.mkdir()
+    with pytest.raises(config.ConfigError):
+        config.load(folder)
+    deep = tmp_path / "deep.toml"
+    deep.write_text("x = " + "[" * 100_000)
+    with pytest.raises(config.ConfigError):
+        config.load(deep)
+
+
+def test_client_id_that_is_not_text_is_rejected(tmp_path: Path) -> None:
+    with pytest.raises(config.ConfigError):
+        config.save(tmp_path / "config.toml", config.Config(client_id="\udcff"))

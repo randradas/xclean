@@ -68,7 +68,10 @@ def login(
     cfg = _config()
     if client_id:
         cfg = config.Config(client_id=client_id, redirect_uri=cfg.redirect_uri)
-        config.save(_config_path(), cfg)
+        try:
+            config.save(_config_path(), cfg)
+        except config.ConfigError as e:
+            raise _fail(str(e)) from None
     if not cfg.client_id:
         raise _fail("first time: run `xclean login --client-id <your X app client ID>`")
 

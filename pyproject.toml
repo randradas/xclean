@@ -23,6 +23,7 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "mutmut>=3.8.1",
     "mypy>=2.4.1",
     "pytest>=9.2.0",
     "respx>=0.23.1",
@@ -48,3 +49,9 @@ ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.mutmut]
+# xclient.py left out: its mutants crash the forked runner on macOS (mutmut 3.8.1).
+source_paths = ["src/xclean/engine.py", "src/xclean/store.py"]
+also_copy = ["src/"]
+pytest_add_cli_args_test_selection = ["tests/"]

@@ -35,16 +35,22 @@ acceptance criteria or decisions the tasks claim that are missing or partial; (b
 asked for (scope creep); (c) things that look implemented but wrong. Quote the AC or D line for
 each. Under 400 words."
 
-**Standards.** "Check the diff against `CLAUDE.md`, `docs/conventions.md`,
-`docs/architecture.md` and the plan's decisions. Cite file and rule for each breach. Also flag, as
+**Standards.** "Check the diff against `CLAUDE.md`, `docs/conventions.md`, `docs/testing.md`,
+`docs/architecture.md` and the plan's decisions. For tests, name the missing case (which input,
+failure or sequence) per `docs/testing.md`, What each task tests. Cite file and rule for each breach. Also flag, as
 judgement calls only, these smells: unclear names, duplicated logic, a function using another
 module's data more than its own, the same params always travelling together, a primitive standing
 in for a domain concept, abstraction the spec does not need. A documented rule beats a smell.
 Skip what ruff and mypy enforce. Under 400 words."
 
+**Mutation (final review only).** Run it yourself, in parallel with the sub-agents (command:
+`docs/conventions.md`). For each survivor, read the mutated line: drop it if it changes nothing
+(equivalent), else report the missing test and what a real bug there would do.
+
 ## 3. Present
 
-- Show findings under `## Bugs`, `## Spec`, `## Standards`. Do not merge or rerank across axes.
+- Show findings under `## Bugs`, `## Spec`, `## Standards` (and `## Mutation` in a final review).
+  Do not merge or rerank across axes.
 - Drop a finding only if its file or line does not exist or the code plainly contradicts it.
   When in doubt keep it and say why you doubt it.
 - For each: what, the failure scenario, and your recommendation: fix, skip, or wrong spec.

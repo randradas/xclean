@@ -18,6 +18,7 @@ Details: `specs/README.md`.
 | Why the product exists, users, goals | `docs/product.md` |
 | System shape, modules, data flow | `docs/architecture.md` |
 | Code style, testing, commits | `docs/conventions.md` |
+| What to test and how | `docs/testing.md` |
 | Domain terms | `docs/glossary.md` |
 | Past decisions | `docs/decisions/` |
 | Current feature work | `specs/NNN-*/` |

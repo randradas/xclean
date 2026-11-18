@@ -16,7 +16,9 @@ A task is not done until its tests cover all that apply:
    State on disk stays valid and nothing done is lost or done twice.
 4. **Sequences.** For anything that counts, retries, waits or resumes: test a sequence of steps,
    including the mixes (fail, other, fail), not just one step.
-5. **Bug fixes.** First a test that fails with the reported scenario, then the fix.
+5. **Prove each new test can fail.** Bug fix: first a test that fails with the reported
+   scenario, then the fix. Test gap (no bug): break the code it guards, by rerunning its mutant
+   or by hand, see the test fail, then undo. Say how in the commit: `proved by: <mutant or edit>`.
 
 Skip what the type checker or linter already proves, and the behaviour of third-party libraries.
 

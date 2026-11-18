@@ -87,6 +87,8 @@ class FileTokenStore:
             return _parse(self.path.read_text())
         except FileNotFoundError:
             return None
+        except UnicodeDecodeError:
+            return None
 
     def save(self, tokens: TokenSet) -> None:
         """Write a new file, then swap it in, so a failure never leaves a half-written file."""

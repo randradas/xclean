@@ -84,7 +84,7 @@ Filled by `/review` after each task group. Open R tasks come before the next T t
   resume. (bugs)
 - [x] R2: Non-JSON body from the token endpoint crashes the run; treat as temporary. (bugs)
 - [x] R3: 429 on token refresh reports "login expired"; treat as temporary. (bugs)
-- [ ] R4: Token save failure after refresh loses the rotated refresh token; write atomically,
+- [x] R4: Token save failure after refresh loses the rotated refresh token; write atomically,
   and `logout` survives a broken token file. (bugs)
 - [x] R5: Local clock ahead of X turns rate-limit waits into ~1 s retries; set a minimum wait,
   one shared default wait. (bugs; AC19)

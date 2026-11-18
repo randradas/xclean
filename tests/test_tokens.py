@@ -206,3 +206,9 @@ def test_failed_save_keeps_new_tokens_in_memory_and_saves_later() -> None:
 
 def test_no_test_doubles_in_production_code() -> None:
     assert not hasattr(tokens_module, "MemoryTokenStore")
+
+
+def test_token_file_that_is_not_text_reads_as_logged_out(tmp_path: Path) -> None:
+    store = FileTokenStore(tmp_path / "tokens.json")
+    store.path.write_bytes(b"\xff\xfe\x00junk")
+    assert store.load() is None

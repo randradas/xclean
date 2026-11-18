@@ -262,3 +262,19 @@ def test_retry_failed_requeues_and_runs_again(store: SqliteStore) -> None:
     Engine(store, second, FakeClock()).run(run)
     assert second.calls == ["1"]
     assert store.counts(run) == Counts(done=2, failed=0, pending=0)
+
+
+def test_retries_running_out_also_break_a_refusal_streak(store: SqliteStore) -> None:
+    """A post that fails after temporary errors is another answer too (R24)."""
+    run = start(store, "1", "2", "3", "4", "5")
+    refused = Result(Outcome.REFUSED, "403: not allowed")
+    remover = FakeRemover(
+        {
+            "1": [refused],
+            "2": [refused],
+            "3": [Result(Outcome.TEMPORARY, "503")] * 4,
+            "4": [refused],
+        }
+    )
+    assert Engine(store, remover, FakeClock()).run(run) is Ending.FINISHED
+    assert "5" in remover.calls

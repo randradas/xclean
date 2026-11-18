@@ -123,6 +123,7 @@ class Engine:
                 case Outcome.TEMPORARY:
                     if retries >= len(self._backoff):
                         store.mark(run_id, item.id, ItemStatus.FAILED, result.reason)
+                        self._refusals = 0
                         return None
                     self._clock.sleep_until(self._clock.now() + self._backoff[retries])
                     retries += 1

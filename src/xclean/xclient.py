@@ -13,7 +13,7 @@ TOKEN_URL = f"{API}/2/oauth2/token"
 REVOKE_URL = f"{API}/2/oauth2/revoke"
 _NOT_FOUND = "https://api.x.com/2/problems/resource-not-found"
 _CREDITS = "https://api.x.com/2/problems/credits-depleted"
-_DEFAULT_WAIT = timedelta(minutes=15)
+RATE_WINDOW = timedelta(minutes=15)  # X's rate-limit window; the wait when X gives none
 
 
 class NotLoggedIn(Exception):
@@ -182,4 +182,4 @@ def _reset_at(response: httpx.Response) -> datetime:
     reset = response.headers.get("x-rate-limit-reset")
     if reset and reset.isdigit():
         return datetime.fromtimestamp(int(reset), UTC)
-    return datetime.now(UTC) + _DEFAULT_WAIT
+    return datetime.now(UTC) + RATE_WINDOW

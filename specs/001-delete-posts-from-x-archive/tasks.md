@@ -86,7 +86,7 @@ Filled by `/review` after each task group. Open R tasks come before the next T t
 - [x] R3: 429 on token refresh reports "login expired"; treat as temporary. (bugs)
 - [x] R4: Token save failure after refresh loses the rotated refresh token; write atomically,
   and `logout` survives a broken token file. (bugs)
-- [ ] R5: Local clock ahead of X turns rate-limit waits into ~1 s retries; set a minimum wait,
+- [x] R5: Local clock ahead of X turns rate-limit waits into ~1 s retries; set a minimum wait,
   one shared default wait. (bugs; AC19)
 - [ ] R6: Resume ignores a stored future `wait_until`. (bugs; AC19, AC20)
 - [ ] R7: `me()` crashes with KeyError when the reply has no `data`. (bugs)

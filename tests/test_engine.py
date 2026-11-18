@@ -135,6 +135,19 @@ def test_rate_limit_waits_until_reset_then_retries(store: SqliteStore) -> None:
     assert store.get_run(run).requests == 1
 
 
+def test_reset_in_the_past_still_waits_a_minimum(store: SqliteStore) -> None:
+    """Local clock ahead of X: the reset looks past, but we must not hammer X (R5)."""
+    run = start(store, "1")
+    past = START - timedelta(minutes=5)
+    remover = FakeRemover({"1": [Result(Outcome.RATE_LIMITED, reset_at=past)] * 3})
+    clock = FakeClock()
+    Engine(store, remover, clock).run(run)
+    assert clock.sleeps[0] >= START + timedelta(minutes=1)
+    assert clock.sleeps[1] - clock.sleeps[0] >= timedelta(minutes=15)
+    assert len(remover.calls) == 4
+    assert store.counts(run).done == 1
+
+
 def test_spending_limit_stops_cleanly_and_resumes(store: SqliteStore) -> None:
     run = start(store, "1", "2")
     remover = FakeRemover({"2": [Result(Outcome.SPENDING_LIMIT, "402: credits depleted")]})

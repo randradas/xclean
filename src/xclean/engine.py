@@ -13,11 +13,14 @@ from typing import Protocol
 from xclean.content_types import Remover
 from xclean.model import Item, ItemStatus, RunState
 from xclean.store import Store
-from xclean.xclient import Outcome
+from xclean.xclient import RATE_WINDOW, Outcome
 
 BACKOFF = (timedelta(seconds=5), timedelta(seconds=30), timedelta(minutes=2))
 # X bills requests it answers; rate-limited and network failures are not counted.
 _BILLED = {Outcome.DELETED, Outcome.ALREADY_GONE, Outcome.FAILED}
+# X's reset time is X's clock. If ours runs ahead, the reset looks past: wait at least this,
+# and a full window when X still says no right after a wait.
+MIN_RATE_WAIT = timedelta(minutes=1)
 
 
 class Clock(Protocol):
@@ -74,6 +77,7 @@ class Engine:
     def _remove_one(self, run_id: int, item: Item) -> Ending | None:
         store = self._store
         retries = 0
+        rate_limited = 0
         while True:
             result = self._remover.remove(item)
             if result.outcome in _BILLED:
@@ -86,7 +90,9 @@ class Engine:
                     store.mark(run_id, item.id, ItemStatus.FAILED, result.reason)
                     return None
                 case Outcome.RATE_LIMITED:
-                    until = result.reset_at or self._clock.now() + timedelta(minutes=15)
+                    floor = RATE_WINDOW if rate_limited else MIN_RATE_WAIT
+                    rate_limited += 1
+                    until = max(result.reset_at or self._clock.now(), self._clock.now() + floor)
                     store.set_state(
                         run_id, RunState.WAITING, wait_until=until, message="rate limit"
                     )

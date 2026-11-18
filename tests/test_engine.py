@@ -170,6 +170,47 @@ def test_resume_honours_a_stored_wait(store: SqliteStore) -> None:
     assert second.calls == ["1"]
 
 
+def stopped_mid_wait(store: SqliteStore, reset: datetime) -> int:
+    run = start(store, "1")
+    remover = FakeRemover({"1": [Result(Outcome.RATE_LIMITED, reset_at=reset)]})
+    with pytest.raises(KeyboardInterrupt):
+        Engine(store, remover, StopDuringWait()).run(run)
+    return run
+
+
+def test_resume_shows_the_stored_wait_while_waiting(store: SqliteStore) -> None:
+    reset = START + timedelta(minutes=12)
+    run = stopped_mid_wait(store, reset)
+    seen: list[tuple[RunState, datetime | None, str]] = []
+
+    def watch() -> None:
+        r = store.get_run(run)
+        seen.append((r.state, r.wait_until, r.message))
+
+    clock = FakeClock()
+    clock.t = START + timedelta(minutes=2)
+    Engine(store, FakeRemover(), clock, on_progress=watch).run(run)
+    assert seen[0] == (RunState.WAITING, reset, "rate limit")
+
+
+def test_stop_during_a_resumed_wait_keeps_the_wait(store: SqliteStore) -> None:
+    """Stopped twice mid-wait: the next resume still knows when X allows requests again."""
+    reset = START + timedelta(minutes=12)
+    run = stopped_mid_wait(store, reset)
+    clock = StopDuringWait()
+    clock.t = START + timedelta(minutes=2)
+    second = FakeRemover()
+    with pytest.raises(KeyboardInterrupt):
+        Engine(store, second, clock).run(run)
+    stopped = store.get_run(run)
+    assert (stopped.state, stopped.wait_until, stopped.message) == (
+        RunState.STOPPED,
+        reset,
+        "interrupted",
+    )
+    assert second.calls == []
+
+
 def test_one_refusal_fails_that_post_only(store: SqliteStore) -> None:
     run = start(store, "1", "2")
     remover = FakeRemover({"1": [Result(Outcome.REFUSED, "403: not allowed")]})
@@ -221,6 +262,9 @@ def test_not_logged_in_stops(store: SqliteStore) -> None:
     remover = FakeRemover({"1": [Result(Outcome.NOT_LOGGED_IN, "run `xclean login`")]})
     assert Engine(store, remover, FakeClock()).run(run) is Ending.NOT_LOGGED_IN
     assert store.counts(run).pending == 1
+    stopped = store.get_run(run)
+    assert stopped.state is RunState.STOPPED
+    assert stopped.message == "run `xclean login`"
 
 
 # T16: stop and resume, retry failed (AC20, AC21)

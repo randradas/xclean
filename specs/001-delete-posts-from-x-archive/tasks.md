@@ -120,9 +120,9 @@ Filled by `/review` after each task group. Open R tasks come before the next T t
 
 ### Review 2: mutation trial on `engine.py` (at 9ee4b96)
 
-- [ ] R26: Spending limit and not logged in return the right ending, but no test checks the run
+- [x] R26: Spending limit and not logged in return the right ending, but no test checks the run
   is saved STOPPED with X's message. (mutation; AC22)
-- [ ] R27: No test checks the stored `wait_until` and message while a resumed run waits out an
+- [x] R27: No test checks the stored `wait_until` and message while a resumed run waits out an
   old rate limit, or during a rate-limit wait in the loop. (mutation; AC19, AC20)
 - [ ] R28: No test proves the 403 counter resets to zero after a success or a run-out retry
   (refuse, refuse, other, refuse, refuse goes on). (mutation; AC22)

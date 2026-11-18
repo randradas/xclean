@@ -78,7 +78,7 @@ Docs and release
 
 Filled by `/review` after each task group. Open R tasks come before the next T task.
 
-### Review 1: T1-T16 (6ce922e..b5b93dd)
+### Review 1: T1-T16 (6ce922e..b5b93dd), closed at e3ea121
 
 - [x] R1: Malformed X error body (`errors` not a list of objects) crashes the run on every
   resume. (bugs)

@@ -124,7 +124,7 @@ Filled by `/review` after each task group. Open R tasks come before the next T t
   is saved STOPPED with X's message. (mutation; AC22)
 - [x] R27: No test checks the stored `wait_until` and message while a resumed run waits out an
   old rate limit, or during a rate-limit wait in the loop. (mutation; AC19, AC20)
-- [ ] R28: No test proves the 403 counter resets to zero after a success or a run-out retry
+- [x] R28: No test proves the 403 counter resets to zero after a success or a run-out retry
   (refuse, refuse, other, refuse, refuse goes on). (mutation; AC22)
 - [x] R29: `set_state` and other run updates silently change nothing for an unknown run id;
   raise instead. (mutation)

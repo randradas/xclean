@@ -128,7 +128,7 @@ Filled by `/review` after each task group. Open R tasks come before the next T t
   (refuse, refuse, other, refuse, refuse goes on). (mutation; AC22)
 - [x] R29: `set_state` and other run updates silently change nothing for an unknown run id;
   raise instead. (mutation)
-- [ ] R30: Stored messages ("interrupted", "rate limit", the 403 reason) are not asserted.
+- [x] R30: Stored messages ("interrupted", "rate limit", the 403 reason) are not asserted.
   (mutation)
 - ~~R31: `RealClock` has no tests.~~ skipped: thin wrapper over the system clock.
 - ~~R32: `rate_limited` count mutants and `>=` at `engine.py:71` survive.~~ skipped: equivalent,

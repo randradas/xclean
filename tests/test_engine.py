@@ -121,16 +121,16 @@ def test_rate_limit_waits_until_reset_then_retries(store: SqliteStore) -> None:
     reset = START + timedelta(minutes=12)
     remover = FakeRemover({"1": [Result(Outcome.RATE_LIMITED, reset_at=reset)]})
     clock = FakeClock()
-    states: list[tuple[RunState, datetime | None]] = []
+    states: list[tuple[RunState, datetime | None, str]] = []
 
     def watch() -> None:
         r = store.get_run(run)
-        states.append((r.state, r.wait_until))
+        states.append((r.state, r.wait_until, r.message))
 
     Engine(store, remover, clock, on_progress=watch).run(run)
     assert clock.sleeps == [reset]
     assert remover.calls == ["1", "1"]
-    assert states[0] == (RunState.WAITING, reset)
+    assert states[0] == (RunState.WAITING, reset, "rate limit")
     assert store.counts(run).done == 1
     assert store.get_run(run).requests == 1
 
@@ -215,7 +215,9 @@ def test_one_refusal_fails_that_post_only(store: SqliteStore) -> None:
     run = start(store, "1", "2")
     remover = FakeRemover({"1": [Result(Outcome.REFUSED, "403: not allowed")]})
     assert Engine(store, remover, FakeClock()).run(run) is Ending.FINISHED
-    assert store.counts(run).failed == 1
+    assert [(f.item.id, f.reason) for f in store.report(run).failures] == [
+        ("1", "403: not allowed")
+    ]
     assert store.counts(run).done == 1
 
 

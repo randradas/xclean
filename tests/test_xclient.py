@@ -5,7 +5,7 @@ import httpx
 import pytest
 import respx
 
-from xclean.xclient import Me, Outcome, XClient
+from xclean.xclient import Me, Outcome, XClient, XError
 
 API = "https://api.x.com"
 DELETE = f"{API}/2/tweets/123"
@@ -164,3 +164,11 @@ def test_only_the_x_client_builds_http_clients() -> None:
     src = Path(__file__).parents[1] / "src" / "xclean"
     builders = [p.name for p in src.rglob("*.py") if "httpx.Client(" in p.read_text()]
     assert builders == ["xclient.py"]
+
+
+@respx.mock
+@pytest.mark.parametrize("body", [{}, {"data": {}}, {"data": {"id": "42"}}, {"data": "x"}])
+def test_me_with_missing_fields_is_an_x_error(client: XClient, body: dict[str, object]) -> None:
+    respx.get(f"{API}/2/users/me").respond(200, json=body)
+    with pytest.raises(XError, match="unreadable"):
+        client.me()

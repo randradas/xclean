@@ -172,10 +172,11 @@ class XClient:
             raise XError("not logged in; run `xclean login`")
         if response.status_code != 200:
             raise XError(f"could not read your X account: {_detail(response)}")
-        data = _body(response).get("data", {})
-        return Me(
-            id=data["id"], username=data["username"], pinned_post_id=data.get("pinned_tweet_id")
-        )
+        data = _body(response).get("data")
+        if not (isinstance(data, dict) and data.get("id") and data.get("username")):
+            raise XError("X gave an unreadable answer about your account; try again")
+        pinned = data.get("pinned_tweet_id")
+        return Me(id=str(data["id"]), username=str(data["username"]), pinned_post_id=pinned)
 
 
 def _reset_at(response: httpx.Response) -> datetime:

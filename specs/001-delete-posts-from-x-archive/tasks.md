@@ -55,10 +55,12 @@ Archive (needs the real archive)
 CLI
 
 - [ ] T20: Preview: counts by type, date range, examples, rules in words, archive date warning,
-  pinned flag, skipped reposts, cost and time. (AC11, AC13, AC14, AC15)
+  pinned flag, skipped reposts, cost and time; small runs must not read as zero time (review 1).
+  (AC11, AC13, AC14, AC15)
 - [ ] T21: `posts` command preview and `--list`; prove zero delete calls without `--delete`.
   (AC10, AC12, AC27)
-- [ ] T22: `--delete` with typed count confirm or `--yes`; unfinished run asks resume or drop.
+- [ ] T22: `--delete` with typed count confirm or `--yes`; unfinished run asks resume or drop;
+  take the run lock (D22) around every run (review 1).
   (AC16, AC17, AC18)
 - [ ] T23: Live progress line: done, left, failed, state, time left, spend so far. (AC23)
 - [ ] T24: `status`, `resume`, `retry-failed` commands; status shows saved report. (AC20, AC21,
@@ -69,4 +71,42 @@ Docs and release
 - [ ] T25: README user docs: get archive, create X app, set spending limit, keep archive,
   commands. (AC26)
 - [ ] T26: `docs/release-checklist.md`; run it on the real account starting with one test post;
-  confirm local callback and delete price, update price table. (AC1, AC11)
+  confirm local callback and delete price, update price table; check whether already-gone and
+  failed deletes are billed (review 1). (AC1, AC11)
+
+## Review
+
+Filled by `/review` after each task group. Open R tasks come before the next T task.
+
+### Review 1: T1-T16 (6ce922e..b5b93dd)
+
+- [ ] R1: Malformed X error body (`errors` not a list of objects) crashes the run on every
+  resume. (bugs)
+- [ ] R2: Non-JSON body from the token endpoint crashes the run; treat as temporary. (bugs)
+- [ ] R3: 429 on token refresh reports "login expired"; treat as temporary. (bugs)
+- [ ] R4: Token save failure after refresh loses the rotated refresh token; write atomically,
+  and `logout` survives a broken token file. (bugs)
+- [ ] R5: Local clock ahead of X turns rate-limit waits into ~1 s retries; set a minimum wait,
+  one shared default wait. (bugs; AC19)
+- [ ] R6: Resume ignores a stored future `wait_until`. (bugs; AC19, AC20)
+- [ ] R7: `me()` crashes with KeyError when the reply has no `data`. (bugs)
+- [ ] R8: `config.save` writes broken TOML when a value contains `"`. (bugs)
+- [ ] R9: Store database and lock file readable by other users; make them owner-only. (bugs)
+- [ ] R10: 403 when credits run out marks posts failed and continues; stop the run and show X's
+  message. (spec; AC22)
+- [ ] R11: `retry-failed` keeps the old run message. (spec; AC21)
+- [ ] R12: Duplicate post IDs in a selection crash the run start; drop duplicates. (spec; AC18)
+- [ ] R13: Token exchange, refresh and revoke send HTTP outside the X client; move them in.
+  Callback server stays in `auth.py` (D14). (standards; D13)
+- [ ] R14: Move `MemoryTokenStore` test double out of production code. (standards)
+- [ ] R15: Rename `Remover` to the glossary term, content type. (standards)
+- ~~R16: Run lock not taken by the engine.~~ moved to T22.
+- ~~R17: Time estimate is zero for small runs.~~ moved to T20.
+- ~~R18: Billing of already-gone and failed deletes is a guess.~~ moved to T26.
+- ~~R19: `x-rate-limit-remaining` ignored on success.~~ skipped: one 429 per window is fine.
+- ~~R20: Unrequested extras (empty date range check, `#` in keep file, NOT_LOGGED_IN result,
+  redirect config, `--version`).~~ skipped: all reasonable.
+- ~~R21: Other smells (paired params, string price key and ids, `estimate_duration` placement,
+  generic `_removal_result`, unused `RateLimit.daily`, Ending vs Outcome, engine imports
+  `xclient`).~~ skipped: judgement calls, not worth the churn.
+- ~~R22: No `tests/fixtures/` folder.~~ skipped: T17 creates it.

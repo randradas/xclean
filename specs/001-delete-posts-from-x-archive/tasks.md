@@ -94,7 +94,7 @@ Filled by `/review` after each task group. Open R tasks come before the next T t
 - [x] R9: Store database and lock file readable by other users; make them owner-only. (bugs)
 - [x] R10: 403 when credits run out marks posts failed and continues; one 403 fails that post,
   three in a row stop the run with X's message. (spec; AC22)
-- [ ] R11: `retry-failed` keeps the old run message. (spec; AC21)
+- [x] R11: `retry-failed` keeps the old run message. (spec; AC21)
 - [ ] R12: Duplicate post IDs in a selection crash the run start; drop duplicates. (spec; AC18)
 - [x] R13: Token exchange, refresh and revoke send HTTP outside the X client; move them in.
   Callback server stays in `auth.py` (D14). (standards; D13)

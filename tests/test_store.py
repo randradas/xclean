@@ -187,3 +187,13 @@ def test_store_files_are_private(tmp_path: Path) -> None:
         for f in files:
             assert f.stat().st_mode & 0o077 == 0, f.name
     assert store.path.parent.stat().st_mode & 0o777 == 0o700
+
+
+def test_requeue_clears_the_old_stop_message(store: SqliteStore) -> None:
+    run = store.start_run(ACCOUNT, [post("1")], rules="all posts")
+    store.mark(run.id, "1", ItemStatus.FAILED, reason="boom")
+    store.set_state(run.id, RunState.STOPPED, message="interrupted")
+    store.requeue_failed(run.id)
+    requeued = store.get_run(run.id)
+    assert requeued.state is RunState.READY
+    assert requeued.message == ""

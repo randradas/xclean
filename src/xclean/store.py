@@ -228,7 +228,8 @@ class SqliteStore:
             )
             if cur.rowcount:
                 self._db.execute(
-                    "UPDATE runs SET state = ?, finished_at = NULL WHERE id = ?",
+                    "UPDATE runs SET state = ?, finished_at = NULL, wait_until = NULL,"
+                    " message = '' WHERE id = ?",
                     (RunState.READY, run_id),
                 )
         return cur.rowcount

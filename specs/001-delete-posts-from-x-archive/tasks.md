@@ -126,7 +126,7 @@ Filled by `/review` after each task group. Open R tasks come before the next T t
   old rate limit, or during a rate-limit wait in the loop. (mutation; AC19, AC20)
 - [ ] R28: No test proves the 403 counter resets to zero after a success or a run-out retry
   (refuse, refuse, other, refuse, refuse goes on). (mutation; AC22)
-- [ ] R29: `set_state` and other run updates silently change nothing for an unknown run id;
+- [x] R29: `set_state` and other run updates silently change nothing for an unknown run id;
   raise instead. (mutation)
 - [ ] R30: Stored messages ("interrupted", "rate limit", the 403 reason) are not asserted.
   (mutation)

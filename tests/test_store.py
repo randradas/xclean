@@ -1,4 +1,5 @@
 import multiprocessing
+from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -202,3 +203,31 @@ def test_requeue_clears_the_old_stop_message(store: SqliteStore) -> None:
 def test_duplicate_ids_are_removed_once(store: SqliteStore) -> None:
     run = store.start_run(ACCOUNT, [post("1"), post("2"), post("1")], rules="all posts")
     assert [i.id for i in store.pending(run.id)] == ["1", "2"]
+
+
+# R29: updates to an unknown run or item are an error, not a silent no-op
+
+
+@pytest.mark.parametrize(
+    "update",
+    [
+        lambda s: s.set_state(999, RunState.STOPPED, message="x"),
+        lambda s: s.add_requests(999),
+        lambda s: s.finish(999),
+        lambda s: s.mark(999, "1", ItemStatus.DONE),
+    ],
+    ids=["set_state", "add_requests", "finish", "mark"],
+)
+def test_update_to_unknown_run_raises(
+    store: SqliteStore, update: Callable[[SqliteStore], None]
+) -> None:
+    store.start_run(ACCOUNT, [post("1")], rules="all posts")
+    with pytest.raises(KeyError, match="999"):
+        update(store)
+
+
+def test_mark_unknown_item_raises(store: SqliteStore) -> None:
+    run = store.start_run(ACCOUNT, [post("1")], rules="all posts")
+    with pytest.raises(KeyError, match="nope"):
+        store.mark(run.id, "nope", ItemStatus.DONE)
+    assert store.counts(run.id) == Counts(done=0, failed=0, pending=1)

@@ -210,10 +210,16 @@ class SqliteStore:
         )
         return [self._item(r) for r in rows]
 
+    def _update(self, sql: str, params: tuple[object, ...], missing: str) -> None:
+        """Run an UPDATE; a wrong id is a bug, so touching no row raises."""
+        if self._db.execute(sql, params).rowcount == 0:
+            raise KeyError(missing)
+
     def mark(self, run_id: int, item_id: str, status: ItemStatus, reason: str = "") -> None:
-        self._db.execute(
+        self._update(
             "UPDATE items SET status = ?, reason = ? WHERE run_id = ? AND item_id = ?",
             (status, reason, run_id, item_id),
+            f"no item {item_id} in run {run_id}",
         )
 
     def counts(self, run_id: int) -> Counts:
@@ -249,19 +255,23 @@ class SqliteStore:
         wait_until: datetime | None = None,
         message: str = "",
     ) -> None:
-        self._db.execute(
+        self._update(
             "UPDATE runs SET state = ?, wait_until = ?, message = ? WHERE id = ?",
             (state, wait_until.isoformat() if wait_until else None, message, run_id),
+            f"no run {run_id}",
         )
 
     def add_requests(self, run_id: int, n: int = 1) -> None:
-        self._db.execute("UPDATE runs SET requests = requests + ? WHERE id = ?", (n, run_id))
+        self._update(
+            "UPDATE runs SET requests = requests + ? WHERE id = ?", (n, run_id), f"no run {run_id}"
+        )
 
     def finish(self, run_id: int) -> None:
-        self._db.execute(
+        self._update(
             "UPDATE runs SET state = ?, wait_until = NULL, message = '', finished_at = ?"
             " WHERE id = ?",
             (RunState.FINISHED, datetime.now(UTC).isoformat(), run_id),
+            f"no run {run_id}",
         )
 
     def report(self, run_id: int) -> Report:

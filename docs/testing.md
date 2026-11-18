@@ -39,7 +39,8 @@ Skip what the type checker or linter already proves, and the behaviour of third-
 | Kind | When |
 |---|---|
 | Unit | Default. Logic with no I/O. |
-| Integration | A module with its real neighbours (DB, files). |
+| Narrow integration | Code that talks to an outside service (HTTP), with the service faked at the wire. |
+| Integration | A module with its real neighbours (DB, files, processes). |
 | Smoke | One happy path per command, through the real entry point. |
 | Live (real service) | Never in the suite. Manual, by the user. |
 | Mutation | In the final review before a spec is `done`, on the riskiest modules. Survivors are test gaps; triage them like review findings. Some survivors change nothing (equivalent); skip those. |

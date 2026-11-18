@@ -123,3 +123,21 @@ def test_network_error_during_refresh_is_temporary_not_logged_out() -> None:
     store = MemoryTokenStore(tokens(expires_in=timedelta(0)))
     client = XClient(UserTokens(store, client_id="cid", now=lambda: NOW))
     assert client.delete_post("1").outcome is Outcome.TEMPORARY
+
+
+@respx.mock
+@pytest.mark.parametrize(
+    "answer",
+    [
+        httpx.Response(200, text="<html>busy</html>"),
+        httpx.Response(200, text=""),
+        httpx.Response(200, json=["a"]),
+        httpx.Response(200, json={"token_type": "bearer"}),
+    ],
+)
+def test_unreadable_refresh_answer_is_temporary(answer: httpx.Response) -> None:
+    respx.post(TOKEN_URL).mock(return_value=answer)
+    store = MemoryTokenStore(tokens(expires_in=timedelta(0)))
+    client = XClient(UserTokens(store, client_id="cid", now=lambda: NOW))
+    assert client.delete_post("1").outcome is Outcome.TEMPORARY
+    assert store.load() == tokens(expires_in=timedelta(0))

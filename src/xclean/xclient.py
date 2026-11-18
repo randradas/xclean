@@ -99,7 +99,9 @@ def request_tokens(data: dict[str, str], http: httpx.Client | None = None) -> di
         raise TemporaryError(f"X login service answered {response.status_code}")
     if response.status_code != 200:
         raise NotLoggedIn(f"X refused the tokens request ({response.status_code})")
-    body: dict[str, Any] = response.json()
+    body = _body(response)
+    if not isinstance(body.get("access_token"), str):
+        raise TemporaryError("X login service gave an unreadable answer")
     return body
 
 

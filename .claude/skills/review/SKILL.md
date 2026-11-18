@@ -21,6 +21,7 @@ Never fix findings on your own.
 Spawn all three in one message. Each gets only: the diff command, `git log --oneline
 <since>..HEAD`, the spec folder path, and its brief below. Never your opinion of the code.
 All are read-only: no edits, no commits, never call real X. Throwaway scripts go in a temp dir.
+Tell each to ignore changes under `.claude/` and `specs/_template/`: workflow, not product.
 
 **Bugs.** "Find defects that make the code do the wrong thing. Read the code around each hunk and
 its tests; run tests or scripts to confirm when you can. Look hardest at: wrong post deleted or
@@ -70,6 +71,9 @@ In `tasks.md`, under `## Review`, add a round:
 Fix open R tasks with `/implement`, before the next T task. Each one: failing test first, fix,
 checks pass, tick the box, commit `<spec id>: R<n> <summary>`.
 
+If the fix must differ from what the user approved, stop, explain why, and update the R line
+before committing.
+
 ## 6. Check the fixes in a fresh context
 
 Spawn one read-only sub-agent. It gets only each fixed R line and its commit SHAs. Brief: "For
@@ -78,5 +82,7 @@ look for unrelated issues. Under 300 words."
 
 - Not fixed: untick it and go back to step 5.
 - Broke something: add a new R task, back to step 5.
-- Same R not fixed after two checks: stop and ask the user.
+- Same R not fixed after two checks: stop and ask the user. Default to offer: fix the
+  remaining gaps broadly (the whole class of error, not one case), then one final check limited
+  to the reported scenarios, then close. Anything new it finds goes to the next review.
 - All fixed: add `closed at <sha>` to the round heading and commit. Next review starts there.

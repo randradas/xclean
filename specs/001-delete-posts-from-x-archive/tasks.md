@@ -118,7 +118,7 @@ Filled by `/review` after each task group. Open R tasks come before the next T t
 - [x] R24: The 403 counter resets only on success, so 403s with other answers between them
   still stop the run; reset on any other answer. (bugs; from R10 check)
 
-### Review 2: mutation trial on `engine.py` (at 9ee4b96)
+### Review 2: mutation trial on `engine.py` (at 9ee4b96), closed at d0d61f8
 
 - [x] R26: Spending limit and not logged in return the right ending, but no test checks the run
   is saved STOPPED with X's message. (mutation; AC22)
